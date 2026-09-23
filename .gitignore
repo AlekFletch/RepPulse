@@ -1,0 +1,26 @@
+# DevEco / hvigor
+/oh_modules
+/local.properties
+/.idea
+**/build
+/.hvigor
+.cxx
+/.clangd
+/.clang-format
+/.clang-tidy
+**/.test
+/.appanalyzer
+
+# Node tooling
+/node_modules
+/coverage
+
+# Signing material — never commit
+*.p12
+*.cer
+*.p7b
+*.csr
+/signing/
+
+# Debug sensor dumps pulled from the watch
+/sensor-logs/

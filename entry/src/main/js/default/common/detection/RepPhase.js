@@ -1,0 +1,10 @@
+export const RepPhase = Object.freeze({
+  IDLE: 'IDLE',
+  READY: 'READY',
+  DESCENT: 'DESCENT',
+  BOTTOM: 'BOTTOM',
+  ASCENT: 'ASCENT',
+  REP_CONFIRMED: 'REP_CONFIRMED',
+  COOLDOWN: 'COOLDOWN',
+  INVALID_MOTION: 'INVALID_MOTION'
+});

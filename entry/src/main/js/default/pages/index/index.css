@@ -1,0 +1,90 @@
+/* Near-black / deep navy background, lime -> turquoise accent. Solid colours only:
+   gradient support in lite CSS is not verified. TODO(device): verify font sizes on Fit 4. */
+.list {
+    width: 100%;
+    height: 100%;
+    background-color: #050A1F;
+    flex-direction: column;
+}
+.header {
+    width: 100%;
+    height: 80px;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+.app-icon {
+    width: 48px;
+    height: 48px;
+    margin-right: 12px;
+}
+.title {
+    width: 220px;
+    height: 48px;
+    font-size: 38px;
+    color: #FFFFFF;
+}
+.tile {
+    width: 100%;
+    height: 96px;
+    flex-direction: row;
+    align-items: center;
+    padding-left: 24px;
+    margin-bottom: 8px;
+    background-color: #0E1638;
+    border-radius: 24px;
+}
+.tile-icon {
+    width: 64px;
+    height: 64px;
+    margin-right: 20px;
+}
+.icon-placeholder {
+    width: 64px;
+    height: 64px;
+    margin-right: 20px;
+    border-radius: 16px;
+    background-color: #1B2550;
+    justify-content: center;
+    align-items: center;
+}
+.placeholder-text {
+    width: 64px;
+    height: 40px;
+    font-size: 30px;
+    text-align: center;
+    color: #8A93B8;
+}
+.tile-label {
+    width: 260px;
+    height: 44px;
+    font-size: 30px;
+    color: #FFFFFF;
+}
+.note-item {
+    width: 100%;
+    height: 90px;
+    justify-content: center;
+    align-items: center;
+}
+.note {
+    width: 340px;
+    height: 80px;
+    font-size: 24px;
+    text-align: center;
+    color: #8A93B8;
+}
+.button-item {
+    width: 100%;
+    height: 100px;
+    justify-content: center;
+    align-items: center;
+}
+.button {
+    width: 300px;
+    height: 72px;
+    font-size: 30px;
+    border-radius: 36px;
+    background-color: #2DE3C4;
+    color: #04101F;
+}

@@ -1,0 +1,24 @@
+{
+  "string": [
+    {
+      "name": "default_desc",
+      "value": "Automatic push-up and squat counter"
+    },
+    {
+      "name": "default_label",
+      "value": "RepPulse"
+    },
+    {
+      "name": "perm_reason_motion",
+      "value": "Counts repetitions from wrist motion on the watch"
+    },
+    {
+      "name": "perm_reason_vibrate",
+      "value": "Vibration cues for start, reps, sets and rest"
+    },
+    {
+      "name": "perm_reason_heart_rate",
+      "value": "Optional heart rate summary for a workout"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "name": "reppulse-tooling",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Node tooling for RepPulse (tests, lint, asset checks). The watch app itself is built by DevEco Studio / hvigor.",
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "lint": "eslint entry/src/main/js tests tools eslint.config.mjs",
+    "check:icons": "node tools/check-icons.js",
+    "check:release": "node tools/check-release.js",
+    "verify": "npm run lint && npm test && npm run check:icons",
+    "gen:fixtures": "node --no-warnings tools/gen-fixtures.mjs"
+  },
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "@babel/core": "^7.29.7",
+    "@babel/preset-env": "^7.29.7",
+    "babel-jest": "^29.7.0",
+    "eslint": "^9.39.5",
+    "globals": "^17.12.0",
+    "jest": "^29.7.0"
+  }
+}

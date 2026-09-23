@@ -1,0 +1,165 @@
+import router from '@system.router';
+import { createSystemTimeAdapter } from '../../common/platform/TimeAdapter.js';
+import { createLogger } from '../../common/platform/Logger.js';
+import { createHapticsAdapter, HapticMode } from '../../common/platform/HapticsAdapter.js';
+import { createScreenAdapter } from '../../common/platform/ScreenAdapter.js';
+import { createHuaweiSensorProvider } from '../../common/sensors/HuaweiSensorProvider.js';
+import { SensorAvailability } from '../../common/sensors/SensorCapabilities.js';
+import { createSystemStorageAdapter } from '../../common/storage/LocalStorageAdapter.js';
+import { toAsciiJson } from '../../common/util/json.js';
+
+/**
+ * Diagnostics page: live accelerometer / gyroscope readings, measured sample rate,
+ * vibration and storage checks. The UI refreshes at 5 Hz, not per sensor sample.
+ */
+const time = createSystemTimeAdapter();
+const logger = createLogger('diagnostics', { debug: true });
+const haptics = createHapticsAdapter(time, logger);
+const screen = createScreenAdapter(logger);
+const storageAdapter = createSystemStorageAdapter();
+
+let provider = null;
+let refreshTimer = null;
+let lastSample = null;
+let gyroSamples = 0;
+
+function fixed(v) {
+    return (Math.round(v * 100) / 100).toString();
+}
+
+export default {
+    data: {
+        accelLine: '',
+        gyroLine: '',
+        rateLine: '',
+        resultLine: ''
+    },
+
+    onInit() {
+        this.accelLine = this.$t('strings.diagAccel') + ': ...';
+        this.gyroLine = this.$t('strings.diagGyro') + ': ...';
+        this.rateLine = this.$t('strings.diagRate') + ': ...';
+    },
+
+    onShow() {
+        screen.keepScreenOn(true);
+        lastSample = null;
+        gyroSamples = 0;
+        provider = createHuaweiSensorProvider(time, logger);
+        provider.start(function (sample) {
+            lastSample = sample;
+            if (sample.hasGyro) {
+                gyroSamples++;
+            }
+        }, function (error) {
+            logger.warn('sensor error ' + error.code);
+        });
+        const self = this;
+        refreshTimer = time.setInterval(function () {
+            self.refresh();
+        }, 200);
+    },
+
+    onHide() {
+        this.release();
+    },
+
+    onDestroy() {
+        this.release();
+    },
+
+    release() {
+        if (refreshTimer !== null) {
+            time.clearInterval(refreshTimer);
+            refreshTimer = null;
+        }
+        if (provider !== null) {
+            provider.stop();
+            provider = null;
+        }
+        haptics.cancelPending();
+        screen.keepScreenOn(false);
+    },
+
+    refresh() {
+        if (provider === null) {
+            return;
+        }
+        const caps = provider.getCapabilities();
+        const noData = this.$t('strings.diagNoData');
+        if (lastSample !== null) {
+            this.accelLine = 'A ' + fixed(lastSample.ax) + ' ' + fixed(lastSample.ay) + ' ' + fixed(lastSample.az);
+        } else {
+            this.accelLine = this.$t('strings.diagAccel') + ': ' + noData;
+        }
+        if (caps.gyroscope === SensorAvailability.UNAVAILABLE) {
+            this.gyroLine = this.$t('strings.diagGyro') + ': ' + noData;
+        } else if (lastSample !== null && lastSample.hasGyro) {
+            this.gyroLine = 'G ' + fixed(lastSample.gx) + ' ' + fixed(lastSample.gy) + ' ' + fixed(lastSample.gz);
+        }
+        this.rateLine = this.$t('strings.diagRate') + ': ' + fixed(caps.measuredRateHz) + ' Hz, G=' + gyroSamples;
+    },
+
+    vibrateShort() {
+        haptics.vibrate(HapticMode.SHORT);
+    },
+
+    vibrateLong() {
+        haptics.vibrate(HapticMode.LONG);
+    },
+
+    /** Writes ~5 KB (more than one 4 KB read chunk) and reads it back. */
+    fileTest() {
+        const self = this;
+        let payload = '';
+        for (let i = 0; i < 70; i++) {
+            payload += this.$t('strings.squats') + '-' + i + ';';
+        }
+        const text = toAsciiJson({ p: payload });
+        storageAdapter.ensureDir('diag', function (dirErr) {
+            if (dirErr) {
+                self.resultLine = 'mkdir: ' + dirErr.code;
+                return;
+            }
+            storageAdapter.writeText('diag/test.json', text, function (writeErr) {
+                if (writeErr) {
+                    self.resultLine = 'write: ' + writeErr.code + ' ' + writeErr.platformCode;
+                    return;
+                }
+                storageAdapter.readText('diag/test.json', function (readErr, back) {
+                    if (readErr) {
+                        self.resultLine = 'read: ' + readErr.code + ' ' + readErr.platformCode;
+                        return;
+                    }
+                    const ok = back === text;
+                    self.resultLine = (ok ? self.$t('strings.diagOk') : self.$t('strings.diagFail')) +
+                        ' file ' + back.length + '/' + text.length;
+                });
+            });
+        });
+    },
+
+    /** Checks whether a 200-character value survives @system.storage. */
+    storageTest() {
+        const self = this;
+        let value = '';
+        for (let i = 0; i < 20; i++) {
+            value += '0123456789';
+        }
+        storageAdapter.setItem('diag_len200', value, function (err) {
+            if (err) {
+                self.resultLine = 'kv set 200: ' + err.message;
+                return;
+            }
+            storageAdapter.getItem('diag_len200', function (getErr, back) {
+                const ok = !getErr && back === value;
+                self.resultLine = (ok ? self.$t('strings.diagOk') : self.$t('strings.diagFail')) +
+                    ' kv ' + (back ? back.length : 0) + '/200';
+            });
+        });
+    },
+
+    goHome() {
+        router.replace({ uri: 'pages/index/index' });
+    }
+};

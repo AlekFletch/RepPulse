@@ -1,0 +1,44 @@
+.list {
+    width: 100%;
+    height: 100%;
+    background-color: #050A1F;
+    flex-direction: column;
+}
+.row {
+    width: 100%;
+    height: 56px;
+    justify-content: center;
+    align-items: center;
+}
+.title {
+    width: 340px;
+    height: 48px;
+    font-size: 30px;
+    text-align: center;
+    color: #C6F432;
+}
+.line {
+    width: 360px;
+    height: 48px;
+    font-size: 24px;
+    text-align: center;
+    color: #FFFFFF;
+}
+.button-item {
+    width: 100%;
+    height: 88px;
+    justify-content: center;
+    align-items: center;
+}
+.button {
+    width: 300px;
+    height: 72px;
+    font-size: 26px;
+    border-radius: 36px;
+    background-color: #2DE3C4;
+    color: #04101F;
+}
+.secondary {
+    background-color: #1B2550;
+    color: #FFFFFF;
+}

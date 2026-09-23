@@ -1,0 +1,59 @@
+{
+  "app": {
+    "bundleName": "com.alekfletch.reppulse",
+    "vendor": "reppulse",
+    "version": {
+      "code": 1000000,
+      "name": "1.0.0"
+    }
+  },
+  "deviceConfig": {},
+  "module": {
+    "deviceType": [
+      "liteWearable"
+    ],
+    "distro": {
+      "deliveryWithInstall": true,
+      "moduleName": "entry",
+      "moduleType": "entry"
+    },
+    "reqPermissions": [
+      {
+        "name": "ohos.permission.ACCELEROMETER",
+        "reason": "$string:perm_reason_motion"
+      },
+      {
+        "name": "ohos.permission.GYROSCOPE",
+        "reason": "$string:perm_reason_motion"
+      },
+      {
+        "name": "ohos.permission.VIBRATE",
+        "reason": "$string:perm_reason_vibrate"
+      },
+      {
+        "name": "ohos.permission.READ_HEALTH_DATA",
+        "reason": "$string:perm_reason_heart_rate"
+      }
+    ],
+    "abilities": [
+      {
+        "name": ".default",
+        "srcLanguage": "js",
+        "srcPath": "default",
+        "icon": "$media:app_icon",
+        "description": "$string:default_desc",
+        "label": "$string:default_label",
+        "type": "page"
+      }
+    ],
+    "js": [
+      {
+        "pages": [
+          "pages/index/index",
+          "pages/diagnostics/diagnostics"
+        ],
+        "name": ".default"
+      }
+    ]
+  }
+}

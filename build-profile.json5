@@ -1,0 +1,39 @@
+{
+  "app": {
+    // Signing configs are local-only (see README). Never commit .p12/.cer/.p7b.
+    "signingConfigs": [],
+    "products": [
+      {
+        "name": "default",
+        "signingConfig": "default",
+        // TODO(device): confirm which API level the Watch Fit 4 firmware accepts.
+        // Community reports: API 20 HAP -> install error 40 on GT 6, API 18 OK.
+        "targetSdkVersion": "5.1.0(18)",
+        "compatibleSdkVersion": "5.0.0(12)",
+        "runtimeOS": "HarmonyOS",
+        "buildOption": {
+          "strictMode": {
+            "caseSensitiveCheck": true,
+            "useNormalizedOHMUrl": false
+          }
+        }
+      }
+    ],
+    "buildModeSet": [
+      { "name": "debug" },
+      { "name": "release" }
+    ]
+  },
+  "modules": [
+    {
+      "name": "entry",
+      "srcPath": "./entry",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": ["default"]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+<!-- Smoke-test page for the first install on Watch Fit 4 (docs/01, section 12). -->
+<list class="list">
+    <list-item class="row">
+        <text class="title">{{ $t('strings.diagnostics') }}</text>
+    </list-item>
+    <list-item class="row">
+        <text class="line">{{ accelLine }}</text>
+    </list-item>
+    <list-item class="row">
+        <text class="line">{{ gyroLine }}</text>
+    </list-item>
+    <list-item class="row">
+        <text class="line">{{ rateLine }}</text>
+    </list-item>
+    <list-item class="row">
+        <text class="line">{{ resultLine }}</text>
+    </list-item>
+    <list-item class="button-item">
+        <input type="button" class="button" value="{{ $t('strings.diagVibrateShort') }}" onclick="vibrateShort"></input>
+    </list-item>
+    <list-item class="button-item">
+        <input type="button" class="button" value="{{ $t('strings.diagVibrateLong') }}" onclick="vibrateLong"></input>
+    </list-item>
+    <list-item class="button-item">
+        <input type="button" class="button" value="{{ $t('strings.diagFileTest') }}" onclick="fileTest"></input>
+    </list-item>
+    <list-item class="button-item">
+        <input type="button" class="button" value="{{ $t('strings.diagStorageTest') }}" onclick="storageTest"></input>
+    </list-item>
+    <list-item class="button-item">
+        <input type="button" class="button secondary" value="{{ $t('strings.toHome') }}" onclick="goHome"></input>
+    </list-item>
+</list>
