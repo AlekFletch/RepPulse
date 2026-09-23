@@ -34,6 +34,7 @@ npm run lint
 - [02 — план MVP](docs/02-mvp-plan.md)
 - [03 — архитектура Этапа 2](docs/03-stage2-architecture.md)
 - [04 — сборка в DevEco и установка на часы](docs/04-deveco-device-setup.md)
+- [05 — статус и передача контекста](docs/05-status-handoff.md)
 
 ## Конфиденциальность
 
