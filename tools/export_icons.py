@@ -12,7 +12,7 @@ from PIL import Image
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(ROOT, "assets-src", "icons")
 MEDIA = os.path.join(ROOT, "entry", "src", "main", "resources", "base", "media")
-IN_APP = os.path.join(ROOT, "entry", "src", "main", "js", "default", "common", "icons")
+IN_APP = os.path.join(ROOT, "entry", "src", "main", "js", "MainAbility", "common", "icons")
 EXPORT = os.path.join(ROOT, "assets-src", "export")
 
 # Launcher icon size follows the official DevEco "[Lite]Empty Ability" template (104x104).

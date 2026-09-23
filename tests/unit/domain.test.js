@@ -1,14 +1,14 @@
 import {
   ExerciseType, WorkoutMode, WorkoutStatus, WristSide, Sensitivity, isEnumValue
-} from '../../entry/src/main/js/default/common/domain/enums.js';
+} from '../../entry/src/main/js/MainAbility/common/domain/enums.js';
 import {
   validatePlan, createWorkoutPlan, createWorkoutSession, createSetResult, plannedSetCount,
   createCalibrationProfile, calibrationKey, createDefaultSettings, sanitizeSettings, settingKeys, PlanError
-} from '../../entry/src/main/js/default/common/domain/models.js';
-import { ALGORITHM_VERSION } from '../../entry/src/main/js/default/common/detection/version.js';
-import { getBaseline, getSensitivityScale } from '../../entry/src/main/js/default/common/detection/DetectionConfig.js';
-import { RepPhase } from '../../entry/src/main/js/default/common/detection/RepPhase.js';
-import { createRepDetectionResult } from '../../entry/src/main/js/default/common/detection/RepDetectionResult.js';
+} from '../../entry/src/main/js/MainAbility/common/domain/models.js';
+import { ALGORITHM_VERSION } from '../../entry/src/main/js/MainAbility/common/detection/version.js';
+import { getBaseline, getSensitivityScale } from '../../entry/src/main/js/MainAbility/common/detection/DetectionConfig.js';
+import { RepPhase } from '../../entry/src/main/js/MainAbility/common/detection/RepPhase.js';
+import { createRepDetectionResult } from '../../entry/src/main/js/MainAbility/common/detection/RepDetectionResult.js';
 
 const base = { exerciseType: ExerciseType.SQUAT, wristSide: WristSide.LEFT, vibrationOnRep: true };
 const plan = (extra) => Object.assign({}, base, extra);

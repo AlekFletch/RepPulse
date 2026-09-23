@@ -8,7 +8,7 @@ const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..');
 const MAIN = path.join(ROOT, 'entry', 'src', 'main');
-const JS_ROOT = path.join(MAIN, 'js', 'default');
+const JS_ROOT = path.join(MAIN, 'js', 'MainAbility');
 const LAUNCHER_ICON_REF = '$media:app_icon';
 const LAUNCHER_ICON_FILE = path.join(MAIN, 'resources', 'base', 'media', 'app_icon.png');
 // Official "[Lite]Empty Ability" template ships a 104x104 launcher icon.

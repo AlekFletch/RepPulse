@@ -1,9 +1,9 @@
 import sensor from '@system.sensor';
-import { createHuaweiSensorProvider } from '../../entry/src/main/js/default/common/sensors/HuaweiSensorProvider.js';
-import { SensorAvailability, canAutoCount } from '../../entry/src/main/js/default/common/sensors/SensorCapabilities.js';
-import { SensorErrorCode } from '../../entry/src/main/js/default/common/sensors/SensorError.js';
-import { createRateMeter } from '../../entry/src/main/js/default/common/sensors/RateMeter.js';
-import { probeSensors } from '../../entry/src/main/js/default/common/platform/DeviceCapabilityChecker.js';
+import { createHuaweiSensorProvider } from '../../entry/src/main/js/MainAbility/common/sensors/HuaweiSensorProvider.js';
+import { SensorAvailability, canAutoCount } from '../../entry/src/main/js/MainAbility/common/sensors/SensorCapabilities.js';
+import { SensorErrorCode } from '../../entry/src/main/js/MainAbility/common/sensors/SensorError.js';
+import { createRateMeter } from '../../entry/src/main/js/MainAbility/common/sensors/RateMeter.js';
+import { probeSensors } from '../../entry/src/main/js/MainAbility/common/platform/DeviceCapabilityChecker.js';
 import { createFakeTimeAdapter } from '../mocks/FakeTimeAdapter.js';
 
 const silentLogger = { warn() {}, debug() {}, info() {}, error() {} };

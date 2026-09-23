@@ -4,9 +4,9 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { squatSeries, pushUpSeries } from '../entry/src/main/js/default/common/sensors/mock/scenarios.js';
-import { serializeSensorLog } from '../entry/src/main/js/default/common/sensors/mock/sensorLog.js';
-import { ALGORITHM_VERSION } from '../entry/src/main/js/default/common/detection/version.js';
+import { squatSeries, pushUpSeries } from '../entry/src/main/js/MainAbility/common/sensors/mock/scenarios.js';
+import { serializeSensorLog } from '../entry/src/main/js/MainAbility/common/sensors/mock/sensorLog.js';
+import { ALGORITHM_VERSION } from '../entry/src/main/js/MainAbility/common/detection/version.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const out = path.join(root, 'tests', 'fixtures');

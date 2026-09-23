@@ -10,7 +10,7 @@ const ROOT = path.resolve(__dirname, '..');
 const errors = [];
 
 const buildConfig = fs.readFileSync(
-  path.join(ROOT, 'entry/src/main/js/default/common/config/buildConfig.js'), 'utf8');
+  path.join(ROOT, 'entry/src/main/js/MainAbility/common/config/buildConfig.js'), 'utf8');
 if (!/DEBUG:\s*false/.test(buildConfig)) {
   errors.push('BuildConfig.DEBUG must be false for release');
 }

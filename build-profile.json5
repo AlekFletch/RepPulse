@@ -7,8 +7,8 @@
         "name": "default",
         "signingConfig": "default",
         // TODO(device): confirm which API level the Watch Fit 4 firmware accepts.
-        // Community reports: API 20 HAP -> install error 40 on GT 6, API 18 OK.
-        "targetSdkVersion": "5.1.0(18)",
+        // Matches the BreathTrainer HAP proven to install on Watch Fit 4 Pro (API 6.1.0(23)).
+        "targetSdkVersion": "5.0.0(12)",
         "compatibleSdkVersion": "5.0.0(12)",
         "runtimeOS": "HarmonyOS",
         "buildOption": {

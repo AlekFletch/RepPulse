@@ -12,37 +12,51 @@
     "deviceType": [
       "liteWearable"
     ],
+    "reqPermissions": [
+      {
+        "name": "ohos.permission.ACCELEROMETER",
+        "reason": "Counts repetitions from wrist motion",
+        "usedScene": {
+          "ability": [
+            ".MainAbility"
+          ],
+          "when": "inuse"
+        }
+      },
+      {
+        "name": "ohos.permission.GYROSCOPE",
+        "reason": "Counts repetitions from wrist motion",
+        "usedScene": {
+          "ability": [
+            ".MainAbility"
+          ],
+          "when": "inuse"
+        }
+      },
+      {
+        "name": "ohos.permission.VIBRATE",
+        "reason": "Vibration cues for start, reps, sets and rest",
+        "usedScene": {
+          "ability": [
+            ".MainAbility"
+          ],
+          "when": "inuse"
+        }
+      }
+    ],
     "distro": {
       "deliveryWithInstall": true,
       "moduleName": "entry",
       "moduleType": "entry"
     },
-    "reqPermissions": [
-      {
-        "name": "ohos.permission.ACCELEROMETER",
-        "reason": "$string:perm_reason_motion"
-      },
-      {
-        "name": "ohos.permission.GYROSCOPE",
-        "reason": "$string:perm_reason_motion"
-      },
-      {
-        "name": "ohos.permission.VIBRATE",
-        "reason": "$string:perm_reason_vibrate"
-      },
-      {
-        "name": "ohos.permission.READ_HEALTH_DATA",
-        "reason": "$string:perm_reason_heart_rate"
-      }
-    ],
     "abilities": [
       {
-        "name": ".default",
+        "name": ".MainAbility",
         "srcLanguage": "js",
-        "srcPath": "default",
+        "srcPath": "MainAbility",
         "icon": "$media:app_icon",
-        "description": "$string:default_desc",
-        "label": "$string:default_label",
+        "description": "$string:MainAbility_desc",
+        "label": "$string:MainAbility_label",
         "type": "page"
       }
     ],
@@ -52,7 +66,7 @@
           "pages/index/index",
           "pages/diagnostics/diagnostics"
         ],
-        "name": ".default"
+        "name": ".MainAbility"
       }
     ]
   }

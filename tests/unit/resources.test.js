@@ -1,11 +1,11 @@
 const fs = require('fs');
 const path = require('path');
 const { checkIcons } = require('../../tools/check-icons');
-import { ICON_SQUAT, ICON_PUSH_UP, ICON_HISTORY, ICON_APP, iconPath } from '../../entry/src/main/js/default/common/icons/icons.js';
-import { PlanError } from '../../entry/src/main/js/default/common/domain/models.js';
+import { ICON_SQUAT, ICON_PUSH_UP, ICON_HISTORY, ICON_APP, iconPath } from '../../entry/src/main/js/MainAbility/common/icons/icons.js';
+import { PlanError } from '../../entry/src/main/js/MainAbility/common/domain/models.js';
 
 const ROOT = path.resolve(__dirname, '../..');
-const JS = path.join(ROOT, 'entry/src/main/js/default');
+const JS = path.join(ROOT, 'entry/src/main/js/MainAbility');
 const load = (locale) => JSON.parse(fs.readFileSync(path.join(JS, 'i18n', locale + '.json'), 'utf8')).strings;
 
 describe('icons', () => {

@@ -3,16 +3,16 @@ import brightness from '@system.brightness';
 import battery from '@system.battery';
 import storage from '@system.storage';
 import file from '@system.file';
-import { createHapticsAdapter, HapticMode } from '../../entry/src/main/js/default/common/platform/HapticsAdapter.js';
-import { createScreenAdapter } from '../../entry/src/main/js/default/common/platform/ScreenAdapter.js';
-import { createBatteryAdapter, isLowBattery } from '../../entry/src/main/js/default/common/platform/BatteryAdapter.js';
-import { createLogger } from '../../entry/src/main/js/default/common/platform/Logger.js';
-import { createPermissionManager, Permission } from '../../entry/src/main/js/default/common/platform/PermissionManager.js';
-import { createSystemStorageAdapter, READ_CHUNK } from '../../entry/src/main/js/default/common/storage/LocalStorageAdapter.js';
-import { createInMemoryStorageAdapter } from '../../entry/src/main/js/default/common/storage/InMemoryStorageAdapter.js';
-import { toUri } from '../../entry/src/main/js/default/common/storage/paths.js';
-import { StorageErrorCode } from '../../entry/src/main/js/default/common/storage/StorageError.js';
-import { toAsciiJson } from '../../entry/src/main/js/default/common/util/json.js';
+import { createHapticsAdapter, HapticMode } from '../../entry/src/main/js/MainAbility/common/platform/HapticsAdapter.js';
+import { createScreenAdapter } from '../../entry/src/main/js/MainAbility/common/platform/ScreenAdapter.js';
+import { createBatteryAdapter, isLowBattery } from '../../entry/src/main/js/MainAbility/common/platform/BatteryAdapter.js';
+import { createLogger } from '../../entry/src/main/js/MainAbility/common/platform/Logger.js';
+import { createPermissionManager, Permission } from '../../entry/src/main/js/MainAbility/common/platform/PermissionManager.js';
+import { createSystemStorageAdapter, READ_CHUNK } from '../../entry/src/main/js/MainAbility/common/storage/LocalStorageAdapter.js';
+import { createInMemoryStorageAdapter } from '../../entry/src/main/js/MainAbility/common/storage/InMemoryStorageAdapter.js';
+import { toUri } from '../../entry/src/main/js/MainAbility/common/storage/paths.js';
+import { StorageErrorCode } from '../../entry/src/main/js/MainAbility/common/storage/StorageError.js';
+import { toAsciiJson } from '../../entry/src/main/js/MainAbility/common/util/json.js';
 import { createFakeTimeAdapter } from '../mocks/FakeTimeAdapter.js';
 
 beforeEach(() => {

@@ -16,7 +16,7 @@ RepPulse/
   entry/src/main/
     config.json                     # deviceType liteWearable, reqPermissions, icon $media:app_icon
     resources/base/media/app_icon.png   # главная иконка (114×114, TODO размер)
-    js/default/
+    js/MainAbility/
       app.js                        # lifecycle, DI-контейнер
       i18n/ru-RU.json, en-US.json
       common/

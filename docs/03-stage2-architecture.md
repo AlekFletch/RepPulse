@@ -11,7 +11,7 @@ RepPulse/
       config.json                         # liteWearable, reqPermissions, icon $media:app_icon
       resources/base/media/app_icon.png   # launcher 104×104 из главной иконки
       resources/base/element/string.json  # label/description/permission reasons
-      js/default/
+      js/MainAbility/
         app.js
         i18n/ru-RU.json, en-US.json       # все строки UI; ключи плоские: $t('strings.<key>')
         pages/index/                       # временная главная (полная — Этап 3)

@@ -1,14 +1,14 @@
 import {
   buildScenario, worldToDevice, repProfile, GRAVITY, MotionType, Pose
-} from '../../entry/src/main/js/default/common/sensors/mock/motionSynth.js';
-import * as Scenarios from '../../entry/src/main/js/default/common/sensors/mock/scenarios.js';
-import { serializeSensorLog, parseSensorLog } from '../../entry/src/main/js/default/common/sensors/mock/sensorLog.js';
-import { createRandom } from '../../entry/src/main/js/default/common/sensors/mock/prng.js';
-import { createMockSensorProvider } from '../../entry/src/main/js/default/common/sensors/MockSensorProvider.js';
-import { assertSensorProvider } from '../../entry/src/main/js/default/common/sensors/SensorProvider.js';
-import { SensorAvailability } from '../../entry/src/main/js/default/common/sensors/SensorCapabilities.js';
-import { SensorErrorCode } from '../../entry/src/main/js/default/common/sensors/SensorError.js';
-import { WristSide } from '../../entry/src/main/js/default/common/domain/enums.js';
+} from '../../entry/src/main/js/MainAbility/common/sensors/mock/motionSynth.js';
+import * as Scenarios from '../../entry/src/main/js/MainAbility/common/sensors/mock/scenarios.js';
+import { serializeSensorLog, parseSensorLog } from '../../entry/src/main/js/MainAbility/common/sensors/mock/sensorLog.js';
+import { createRandom } from '../../entry/src/main/js/MainAbility/common/sensors/mock/prng.js';
+import { createMockSensorProvider } from '../../entry/src/main/js/MainAbility/common/sensors/MockSensorProvider.js';
+import { assertSensorProvider } from '../../entry/src/main/js/MainAbility/common/sensors/SensorProvider.js';
+import { SensorAvailability } from '../../entry/src/main/js/MainAbility/common/sensors/SensorCapabilities.js';
+import { SensorErrorCode } from '../../entry/src/main/js/MainAbility/common/sensors/SensorError.js';
+import { WristSide } from '../../entry/src/main/js/MainAbility/common/domain/enums.js';
 import { createFakeTimeAdapter } from '../mocks/FakeTimeAdapter.js';
 
 const mag = (s) => Math.sqrt(s.ax * s.ax + s.ay * s.ay + s.az * s.az);

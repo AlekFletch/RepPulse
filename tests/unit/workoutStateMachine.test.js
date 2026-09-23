@@ -1,7 +1,7 @@
-import { WorkoutStatus as S } from '../../entry/src/main/js/default/common/domain/enums.js';
+import { WorkoutStatus as S } from '../../entry/src/main/js/MainAbility/common/domain/enums.js';
 import {
   canTransition, createWorkoutStateMachine, isTerminal, isCounting
-} from '../../entry/src/main/js/default/common/domain/workoutStateMachine.js';
+} from '../../entry/src/main/js/MainAbility/common/domain/workoutStateMachine.js';
 
 describe('workout state machine', () => {
   test('sets flow: draft -> countdown -> active -> rest -> countdown -> active -> completed', () => {

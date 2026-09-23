@@ -1,13 +1,13 @@
 import {
   setRepTotal, cadence, findBestSet, weightedConfidence, computeSessionTotals
-} from '../../entry/src/main/js/default/common/domain/stats.js';
+} from '../../entry/src/main/js/MainAbility/common/domain/stats.js';
 import {
   stepFor, normalizeDuration, incrementDuration, decrementDuration
-} from '../../entry/src/main/js/default/common/domain/durationSteps.js';
-import { formatDuration, roundCadence, fill } from '../../entry/src/main/js/default/common/util/format.js';
-import { toAsciiJson, safeParse } from '../../entry/src/main/js/default/common/util/json.js';
-import { extend, clamp, indexWhere, isInteger } from '../../entry/src/main/js/default/common/util/obj.js';
-import { generateId } from '../../entry/src/main/js/default/common/util/id.js';
+} from '../../entry/src/main/js/MainAbility/common/domain/durationSteps.js';
+import { formatDuration, roundCadence, fill } from '../../entry/src/main/js/MainAbility/common/util/format.js';
+import { toAsciiJson, safeParse } from '../../entry/src/main/js/MainAbility/common/util/json.js';
+import { extend, clamp, indexWhere, isInteger } from '../../entry/src/main/js/MainAbility/common/util/obj.js';
+import { generateId } from '../../entry/src/main/js/MainAbility/common/util/id.js';
 
 const set = (n, auto, manual, active, conf) =>
   ({ setNumber: n, autoReps: auto, manualAdjustment: manual, activeDurationSec: active, avgConfidence: conf });

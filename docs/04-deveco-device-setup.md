@@ -30,7 +30,7 @@ git clone https://github.com/AlekFletch/RepPulse.git
 2. DevEco запустит **Sync** (hvigor). Дождитесь окончания: прогресс виден внизу справа, результат — во вкладке **Build**.
    - Если IDE предлагает обновить или мигрировать файлы проекта (modelVersion, hvigor), соглашайтесь. Потом пришлите мне вывод `git diff`, я закоммичу изменения.
    - Если пишет, что SDK не найден: **File → Settings → SDK** и отметить нужную версию HarmonyOS SDK.
-3. Откройте `entry/src/main/js/default/pages/index/index.hml`, затем **View → Tool Windows → Previewer**.
+3. Откройте `entry/src/main/js/MainAbility/pages/index/index.hml`, затем **View → Tool Windows → Previewer**.
    - Должна появиться главная с заголовком «Тренировка», иконками «Приседания» и «Отжимания», заглушкой «—» у «Истории» и кнопкой «Диагностика».
    - В Previewer и симуляторе датчики **не работают**. Здесь проверяем только, что разметка собирается.
 4. Сделайте скриншот Previewer. Он пригодится для настройки размеров на Этапе 3.
