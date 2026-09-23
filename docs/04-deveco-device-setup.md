@@ -131,8 +131,15 @@ git clone https://github.com/AlekFletch/RepPulse.git
 
 4. **OK**. DevEco запишет конфигурацию в `build-profile.json5`, пароли — в зашифрованном виде.
 
-> ⚠ **Важно:** после этого шага **не коммитьте** `build-profile.json5` с заполненным `signingConfigs`: там пути и зашифрованные пароли. Перед коммитом выполните `git checkout -- build-profile.json5` для этого блока или просто не добавляйте файл. На Этапе 3 я вынесу подпись в отдельный локальный файл, чтобы это не мешало.
-
+> **Подпись не попадёт в git.** `build-profile.json5` проходит через git clean-фильтр `tools/strip-signing.js`: при коммите массив `signingConfigs` заменяется на `[]`, а локальный файл с подписью остаётся как есть. Все остальные правки файла, например `compatibleSdkVersion`, коммитятся как обычно.
+>
+> Фильтр подключается один раз на каждый клон репозитория:
+> ```bash
+> git config filter.strip-signing.clean "node tools/strip-signing.js"
+> git config filter.strip-signing.smudge cat
+> git config filter.strip-signing.required true
+> ```
+> В `C:\Claude\RepPulse` он уже подключён.
 ---
 
 ## Шаг 7. Собрать HAP

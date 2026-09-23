@@ -1,3 +1,4 @@
 * text=auto eol=lf
 *.png binary
 *.webp binary
+build-profile.json5 filter=strip-signing
