@@ -15,6 +15,7 @@
 | Вопрос | Ответ |
 |---|---|
 | Класс устройства | Watch Fit 4 — **lite wearable** (轻量级智能穿戴). **REP/OFF** |
+| Тестовое устройство | **Watch Fit 4 Pro**: прошивка 6.1.0.117 (SP20C00M05), API **6.1.0(23)**. Экран такой же, как у Fit 4: 1.82" AMOLED 480×408, PPI 347. Акселерометр и гироскоп есть у обеих моделей. **OFF** ([specs](https://consumer.huawei.com/en/wearables/watch-fit4-pro/specs/)) |
 | Стек разработки | **DevEco Studio → проект Lite Wearable → JS UI framework (HML + CSS + JS), FA-модель, `config.json`**. Движок — ACE Engine Lite + JerryScript. |
 | ArkTS / ArkUI | **Недоступны на Fit 4.** ArkTS поддерживают только «полные» wearable (линейка Watch 3/4/5). HAP на ArkTS не ставится на lite-часы. **REP** |
 | Нативные приложения на международной версии | Fit 4 поддерживает установку приложений через Huawei Health → устройство → AppGallery. Каталог в международной версии меньше, чем в китайской. **OFF** |
