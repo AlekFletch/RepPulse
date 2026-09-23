@@ -140,6 +140,7 @@ git clone https://github.com/AlekFletch/RepPulse.git
 > git config filter.strip-signing.required true
 > ```
 > В `C:\Claude\RepPulse` он уже подключён.
+
 ---
 
 ## Шаг 7. Собрать HAP
