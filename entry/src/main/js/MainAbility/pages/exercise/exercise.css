@@ -67,6 +67,12 @@
     font-size: 20px;
     color: #8A93B8;
 }
+.calib-hint {
+    width: 360px;
+    height: 112px;
+    font-size: 20px;
+    color: #B8F34A;
+}
 .warn-item {
     width: 360px;
     height: 44px;

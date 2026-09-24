@@ -1,30 +1,56 @@
-<!-- CalibrationScreen (spec 2.6). Stage 3: wrist choice and instructions; the recording and
-     CalibrationEngine arrive in Stage 4 together with rep detection. -->
+<!-- CalibrationScreen (spec 2.6): wrist, instructions, 3-2-1, 3–5 reps, result. -->
 <div class="page" onswipe="onSwipe">
-    <list class="list" ref="list">
-        <list-item class="header">
-            <div class="back" onclick="goBack">
-                <text class="back-text">{{ $t('strings.back') }}</text>
-            </div>
-            <image class="icon" src="{{icon}}"></image>
-            <text class="title">{{ $t('strings.calibration') }}</text>
-        </list-item>
-        <list-item class="caption-item">
-            <text class="caption">{{ $t('strings.chooseWrist') }}</text>
-        </list-item>
-        <list-item class="row-item">
-            <div class="choice" style="background-color: {{leftColor}};" onclick="chooseLeft">
-                <text class="choice-text" style="color: {{leftText}};">{{ $t('strings.wristLeft') }}</text>
-            </div>
-            <div class="choice" style="background-color: {{rightColor}};" onclick="chooseRight">
-                <text class="choice-text" style="color: {{rightText}};">{{ $t('strings.wristRight') }}</text>
-            </div>
-        </list-item>
-        <list-item class="text-item">
-            <text class="text">{{ $t('strings.calibrationInstruction') }}</text>
-        </list-item>
-        <list-item class="note-item">
-            <text class="note">{{ $t('strings.calibrationSoon') }}</text>
-        </list-item>
-    </list>
+    <div class="view" if="{{vSetup}}">
+        <list class="list" ref="list">
+            <list-item class="header">
+                <div class="back" onclick="goBack">
+                    <text class="back-text">{{ $t('strings.back') }}</text>
+                </div>
+                <image class="icon" src="{{icon}}"></image>
+                <text class="title">{{ $t('strings.calibration') }}</text>
+            </list-item>
+            <list-item class="caption-item">
+                <text class="caption">{{ $t('strings.chooseWrist') }}</text>
+            </list-item>
+            <list-item class="row-item">
+                <div class="choice" style="background-color: {{leftColor}};" onclick="chooseLeft">
+                    <text class="choice-text" style="color: {{leftText}};">{{ $t('strings.wristLeft') }}</text>
+                </div>
+                <div class="choice" style="background-color: {{rightColor}};" onclick="chooseRight">
+                    <text class="choice-text" style="color: {{rightText}};">{{ $t('strings.wristRight') }}</text>
+                </div>
+            </list-item>
+            <list-item class="text-item">
+                <text class="text">{{ $t('strings.calibrationInstruction') }}</text>
+            </list-item>
+            <list-item class="start" onclick="start">
+                <text class="start-text">{{ $t('strings.start') }}</text>
+            </list-item>
+        </list>
+    </div>
+
+    <div class="view-center" if="{{vCountdown}}">
+        <text class="caption-center">{{ $t('strings.getReady') }}</text>
+        <text class="countdown">{{countdownText}}</text>
+    </div>
+
+    <div class="view-center" if="{{vRecording}}">
+        <text class="caption-center">{{ $t('strings.calibRecording') }}</text>
+        <text class="big">{{repsText}}</text>
+        <text class="progress-text">{{progressText}}</text>
+        <div class="finish" style="background-color: {{finishColor}};" onclick="finishEarly">
+            <text class="finish-text" style="color: {{finishTextColor}};">{{ $t('strings.calibFinish') }}</text>
+        </div>
+    </div>
+
+    <div class="view-center" if="{{vResult}}">
+        <text class="result-title" style="color: {{resultColor}};">{{resultTitle}}</text>
+        <text class="result-text">{{resultText}}</text>
+        <div class="finish" style="background-color: #2DE3C4;" onclick="retry">
+            <text class="finish-text">{{ $t('strings.calibRetry') }}</text>
+        </div>
+        <div class="back-wide" onclick="goBack">
+            <text class="back-wide-text">{{ $t('strings.calibFinish') }}</text>
+        </div>
+    </div>
 </div>

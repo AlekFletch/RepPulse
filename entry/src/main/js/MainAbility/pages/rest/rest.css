@@ -1,4 +1,4 @@
-/* 408 x 480 portrait. Every view fills the screen; only one is shown at a time. */
+/* Same look as the workout page: 408 x 480, one centred view at a time. */
 .page {
     width: 408px;
     height: 480px;
@@ -12,10 +12,6 @@
     align-items: center;
     justify-content: center;
 }
-.hero-icon {
-    width: 64px;
-    height: 64px;
-}
 .caption {
     width: 360px;
     height: 44px;
@@ -24,95 +20,12 @@
     text-align: center;
     color: #8A93B8;
 }
-.countdown {
-    width: 360px;
-    height: 150px;
-    font-size: 140px;
-    text-align: center;
-    color: #B8F34A;
-}
-.top-row {
-    width: 360px;
-    height: 40px;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-}
-.small-icon {
-    width: 28px;
-    height: 28px;
-    margin-right: 8px;
-}
-.top-text {
-    width: 300px;
-    height: 36px;
-    font-size: 24px;
-    color: #FFFFFF;
-}
-.set-label {
-    width: 360px;
-    height: 30px;
-    font-size: 22px;
-    text-align: center;
-    color: #8A93B8;
-}
-.counter {
-    width: 360px;
-    height: 130px;
-    font-size: 120px;
-    text-align: center;
-    color: #FFFFFF;
-}
-.counter-paused {
-    width: 360px;
-    height: 90px;
-    font-size: 80px;
-    text-align: center;
-    color: #FFFFFF;
-}
-.line-accent {
-    width: 360px;
-    height: 34px;
-    font-size: 26px;
-    text-align: center;
-    color: #B8F34A;
-}
 .line {
     width: 360px;
     height: 34px;
     font-size: 26px;
     text-align: center;
     color: #FFFFFF;
-}
-.line-dim {
-    width: 360px;
-    height: 32px;
-    font-size: 22px;
-    text-align: center;
-    color: #8A93B8;
-}
-.note {
-    width: 360px;
-    height: 48px;
-    font-size: 18px;
-    text-align: center;
-    color: #8A93B8;
-}
-.button {
-    width: 320px;
-    height: 72px;
-    margin-top: 8px;
-    justify-content: center;
-    align-items: center;
-    border-radius: 36px;
-    background-color: #2DE3C4;
-}
-.button-text {
-    width: 290px;
-    height: 38px;
-    font-size: 28px;
-    text-align: center;
-    color: #04101F;
 }
 .button-dark {
     width: 320px;
@@ -178,6 +91,28 @@
     width: 150px;
     height: 34px;
     font-size: 24px;
+    text-align: center;
+    color: #04101F;
+}
+.rest-timer {
+    width: 360px;
+    height: 110px;
+    font-size: 96px;
+    text-align: center;
+    color: #2DE3C4;
+}
+.half-accent {
+    width: 162px;
+    height: 72px;
+    justify-content: center;
+    align-items: center;
+    border-radius: 24px;
+    background-color: #2DE3C4;
+}
+.half-accent-text {
+    width: 150px;
+    height: 60px;
+    font-size: 22px;
     text-align: center;
     color: #04101F;
 }

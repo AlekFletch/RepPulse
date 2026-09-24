@@ -1,15 +1,16 @@
-<!-- Preparation, active set, pause and rest (spec 2.3–2.5) share one page and switch by state:
-     fewer page transitions, and the session controller lives in a single page bundle. -->
+<!-- Preparation, active set, pause and exit confirmation (spec 2.3–2.5) share one page and switch
+     by state (`if`: only the visible view is built, which matters on the ~100 KB JS heap).
+     The rest between sets is the `rest` page. -->
 <div class="page" onswipe="onSwipe">
     <!-- PreparationScreen -->
-    <div class="view" show="{{vPrepare}}">
+    <div class="view" if="{{vPrepare}}">
         <image class="hero-icon" src="{{iconHero}}"></image>
         <text class="caption">{{ $t('strings.getReady') }}</text>
         <text class="countdown">{{countdownText}}</text>
     </div>
 
     <!-- ActiveWorkoutScreen -->
-    <div class="view" show="{{vActive}}">
+    <div class="view" if="{{vActive}}">
         <div class="top-row">
             <image class="small-icon" src="{{iconSmall}}"></image>
             <text class="top-text">{{topText}}</text>
@@ -26,7 +27,7 @@
     </div>
 
     <!-- PauseScreen -->
-    <div class="view" show="{{vPaused}}">
+    <div class="view" if="{{vPaused}}">
         <text class="caption">{{ $t('strings.pause') }}</text>
         <text class="counter-paused">{{repsText}}</text>
         <div class="row">
@@ -45,27 +46,8 @@
         </div>
     </div>
 
-    <!-- RestScreen -->
-    <div class="view" show="{{vRest}}">
-        <text class="caption">{{ $t('strings.rest') }}</text>
-        <text class="rest-timer">{{restText}}</text>
-        <text class="line">{{nextSetText}}</text>
-        <text class="line-two">{{lastSetText}}</text>
-        <div class="row">
-            <div class="half-accent" onclick="startNow">
-                <text class="half-accent-text">{{startNowText}}</text>
-            </div>
-            <div class="half" onclick="extendRest">
-                <text class="half-text">{{ $t('strings.plusRest') }}</text>
-            </div>
-        </div>
-        <div class="button-dark" onclick="finish">
-            <text class="button-dark-text">{{ $t('strings.finishWorkout') }}</text>
-        </div>
-    </div>
-
     <!-- Swipe right during a workout asks first (the workout is paused meanwhile). -->
-    <div class="view" show="{{vConfirm}}">
+    <div class="view" if="{{vConfirm}}">
         <text class="caption-wide">{{ $t('strings.exitWorkoutConfirm') }}</text>
         <text class="line-two">{{ $t('strings.exitWorkoutHint') }}</text>
         <div class="row">

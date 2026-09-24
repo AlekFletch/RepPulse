@@ -1,5 +1,6 @@
 import router from '@system.router';
 import { createSystemStorageAdapter } from '../../common/storage/LocalStorageAdapter.js';
+import { finalizeSession } from '../../common/domain/stats.js';
 import { createWorkoutRepository } from '../../common/storage/WorkoutRepository.js';
 import { exerciseIcon, focusRotation, go } from '../../common/ui/page.js';
 import { setRows, summaryRows } from '../../common/ui/summaryView.js';
@@ -9,12 +10,13 @@ let session = null;
 let saved = false;
 let saving = false;
 
-/** params: planJson + optionsJson (for "Повторить"), saveFailed ('true' when the finished session was not stored). */
+/** params: planJson + optionsJson (for "Повторить"), finishRestSec (finished from the rest page), saveFailed ('true' when the finished session was not stored). */
 export default {
     data: {
         planJson: '',
         optionsJson: '',
         saveFailed: '',
+        finishRestSec: '',
         icon: '',
         totalText: '',
         rows: [],
@@ -39,6 +41,13 @@ export default {
                 self.showMessage('loadFailed');
                 return;
             }
+            // Totals are computed here, not on the workout page (its JS heap is full). Finished from
+            // the rest page: that rest is added and the session closed now.
+            if (self.finishRestSec !== '') {
+                last.restDurationSec += Number(self.finishRestSec) || 0;
+            }
+            finalizeSession(last, typeof last.finishedAt === 'number' && self.finishRestSec === ''
+                ? last.finishedAt : new Date().getTime());
             session = last;
             self.show(last);
         });

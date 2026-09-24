@@ -46,6 +46,8 @@ async function main() {
   }
   for (const file of jsFiles(OUT)) {
     const source = fs.readFileSync(file, 'utf8');
+    // mangle only, like the SDK's release build: terser's compress rewrites the bundles into a shape
+    // the ACE lite page loader rejects ("TypeError: wrong type of argument" in every page).
     const result = await terser.minify(source, { compress: false, mangle: true, ecma: 5 });
     if (!result.code) {
       throw new Error('terser produced nothing for ' + file);

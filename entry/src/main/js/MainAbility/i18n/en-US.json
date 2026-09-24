@@ -87,7 +87,6 @@
     "endedByManual": "Finished manually",
     "setDone": "Set {n}: {reps} reps",
     "manualCounting": "Manual counting: fix reps on the pause screen",
-    "autoCountSoon": "Auto counting arrives in Stage 4. Fix reps on the pause screen for now",
     "exercise": "Exercise",
     "mode": "Mode",
     "totalReps": "Total reps",
@@ -116,10 +115,14 @@
     "sensLow": "Low",
     "sensStandard": "Standard",
     "sensHigh": "High",
-    "calibrationSoon": "Calibration arrives in Stage 4",
     "setsCount": "{n} sets",
     "repsCount": "{n} reps",
     "exitWorkoutConfirm": "Finish the workout?",
-    "exitWorkoutHint": "Completed sets go to the summary"
+    "exitWorkoutHint": "Completed sets go to the summary",
+    "calibReps": "Reps: {n} of {max}",
+    "calibFinish": "Done",
+    "calibRetry": "Try again",
+    "calibRecording": "Do your reps",
+    "calibSaved": "Profile saved for the {wrist} wrist"
   }
 }

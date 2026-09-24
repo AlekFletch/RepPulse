@@ -5,6 +5,7 @@ import { createCountdownController } from '../../entry/src/main/js/MainAbility/c
 import { createRestTimerController } from '../../entry/src/main/js/MainAbility/common/workout/RestTimerController.js';
 import { createHapticFeedbackController } from '../../entry/src/main/js/MainAbility/common/workout/HapticFeedbackController.js';
 import { createNullRepDetector } from '../../entry/src/main/js/MainAbility/common/detection/RepDetector.js';
+import { finalizeSession } from '../../entry/src/main/js/MainAbility/common/domain/stats.js';
 import { SensorErrorCode } from '../../entry/src/main/js/MainAbility/common/sensors/SensorError.js';
 import { createFakeTimeAdapter } from '../mocks/FakeTimeAdapter.js';
 
@@ -136,6 +137,9 @@ describe('WorkoutSessionController', () => {
     t.ctrl.finish();
     const session = t.ctrl.getSession();
     expect(session.sets[0]).toMatchObject({ autoReps: 1, manualAdjustment: 1, totalReps: 2, endedBy: SetEndReason.MANUAL });
+    expect(session.status).toBe(S.COMPLETED);
+    // Totals are computed by the summary page (finalizeSession), not by the controller.
+    finalizeSession(session, session.finishedAt);
     expect(session).toMatchObject({ totalReps: 2, totalAutoReps: 1, totalManualAdjustment: 1, status: S.COMPLETED });
   });
 
@@ -149,34 +153,49 @@ describe('WorkoutSessionController', () => {
     expect(t.sensors.isRunning()).toBe(false);
     expect(t.haptics.calls).toContain('workoutComplete');
     expect(t.ctrl.getSession().sets[0].endedBy).toBe(SetEndReason.TIME);
-    expect(t.ctrl.getSession().activeDurationSec).toBeCloseTo(30, 0);
+    expect(finalizeSession(t.ctrl.getSession(), 0).activeDurationSec).toBeCloseTo(30, 0);
     expect(t.time.pendingTimers()).toBe(0);
   });
 
-  test('sets: target reps -> rest with warnings -> countdown -> next set -> summary', () => {
-    const t = setup({
-      mode: WorkoutMode.SETS, setCount: 2, targetReps: 3, restDurationSec: 10, autoStartNextSet: true
-    });
+  test('sets: target reps end the set -> RESTING, the controller stops for the rest page', () => {
+    const t = setup({ mode: WorkoutMode.SETS, setCount: 2, targetReps: 3, restDurationSec: 10, autoStartNextSet: true });
     t.ctrl.start();
     t.time.advance(3000 + 750);
     t.rep(); t.rep(); t.rep();
     expect(t.ctrl.getStatus()).toBe(S.RESTING);
-    expect(t.last()).toMatchObject({ lastEndedBy: SetEndReason.TARGET_REPS, setNumber: 2, restRemainingSec: 10 });
+    expect(t.last()).toMatchObject({ lastEndedBy: SetEndReason.TARGET_REPS, setNumber: 2, setCount: 2 });
+    expect(t.last().lastSet).toMatchObject({ setNumber: 1, totalReps: 3 });
     expect(t.haptics.calls).toContain('setComplete');
-    t.time.advance(10000);
-    expect(t.haptics.calls.filter((c) => c === 'restWarning').length).toBe(3);
-    expect(t.haptics.calls).toContain('restEnd');
-    expect(t.ctrl.getStatus()).toBe(S.PREPARING);
-    t.time.advance(3000 + 750);
-    expect(t.last().setNumber).toBe(2);
-    t.rep(); t.rep(); t.rep();
-    expect(t.ctrl.getStatus()).toBe(S.COMPLETED);
-    const session = t.ctrl.getSession();
+    expect(t.sensors.isRunning()).toBe(false);
+    expect(t.time.pendingTimers()).toBe(0);
+  });
+
+  test('continuing a saved session runs the next set and completes the workout', () => {
+    const first = setup({ mode: WorkoutMode.SETS, setCount: 2, targetReps: 3, restDurationSec: 10 }, { countdown: false });
+    first.ctrl.start();
+    first.time.advance(750);
+    first.rep(); first.rep(); first.rep();
+    // The rest page adds the rest it measured, then the workout page continues the same session.
+    const saved = JSON.parse(JSON.stringify(first.ctrl.getSession()));
+    saved.restDurationSec += 12;
+    const time = createFakeTimeAdapter(60000);
+    const sensors = fakeSensors();
+    const haptics = fakeHaptics();
+    const ctrl = createWorkoutSessionController({
+      plan: saved.plan, session: saved, time: time, sensors: sensors, detector: scriptedDetector(),
+      haptics: haptics, countdownEnabled: true
+    });
+    expect(ctrl.snapshot().setNumber).toBe(2);
+    ctrl.start();
+    time.advance(3000 + 750);
+    expect(ctrl.snapshot()).toMatchObject({ status: S.ACTIVE, setNumber: 2 });
+    sensors.emit({ rep: true }); sensors.emit({ rep: true }); sensors.emit({ rep: true });
+    expect(ctrl.getStatus()).toBe(S.COMPLETED);
+    const session = finalizeSession(ctrl.getSession(), time.now());
     expect(session.sets.length).toBe(2);
-    expect(session.totalReps).toBe(6);
-    expect(session.restDurationSec).toBeCloseTo(10, 0);
+    expect(session).toMatchObject({ totalReps: 6, restDurationSec: 12, status: S.COMPLETED });
     expect(session.sets[0].avgConfidence).toBeCloseTo(0.8, 5);
-    expect(session.finishedAt - session.startedAt).toBeGreaterThan(0);
+    expect(haptics.calls).toContain('workoutComplete');
   });
 
   test('sets: reps and time both set, the first reached wins and is reported', () => {
@@ -186,43 +205,6 @@ describe('WorkoutSessionController', () => {
     t.ctrl.start();
     t.time.advance(20250);
     expect(t.last()).toMatchObject({ status: S.RESTING, lastEndedBy: SetEndReason.TIME });
-  });
-
-  test('rest: +15 s, "start now" skips the countdown, manual next set when auto-start is off', () => {
-    const t = setup({
-      mode: WorkoutMode.SETS, setCount: 3, targetReps: 1, restDurationSec: 10, autoStartNextSet: false
-    });
-    t.ctrl.start();
-    t.time.advance(3750);
-    t.rep();
-    t.ctrl.extendRest(15);
-    expect(t.last().restRemainingSec).toBe(25);
-    t.time.advance(5000);
-    t.ctrl.startNow();
-    expect(t.ctrl.getStatus()).toBe(S.ACTIVE);
-    expect(t.ctrl.getSession().restDurationSec).toBeCloseTo(5, 0);
-    t.time.advance(750);
-    t.rep();
-    t.time.advance(10000);
-    expect(t.ctrl.getStatus()).toBe(S.RESTING);
-    expect(t.last().restDone).toBe(true);
-    t.time.advance(4000);
-    t.ctrl.startNextSet();
-    expect(t.ctrl.getStatus()).toBe(S.PREPARING);
-    expect(t.ctrl.getSession().restDurationSec).toBeCloseTo(19, 0);
-  });
-
-  test('finish during rest completes with the sets done so far', () => {
-    const t = setup({ mode: WorkoutMode.SETS, setCount: 5, targetReps: 1, restDurationSec: 60 }, { countdown: false });
-    t.ctrl.start();
-    t.time.advance(750);
-    t.rep();
-    t.time.advance(20000);
-    t.ctrl.finish();
-    expect(t.ctrl.getStatus()).toBe(S.COMPLETED);
-    expect(t.ctrl.getSession().sets.length).toBe(1);
-    expect(t.ctrl.getSession().restDurationSec).toBeCloseTo(20, 0);
-    expect(t.time.pendingTimers()).toBe(0);
   });
 
   test('finish before any set cancels; hiding the page pauses', () => {
@@ -247,7 +229,7 @@ describe('WorkoutSessionController', () => {
     const t = setup({ mode: WorkoutMode.FREE }, { countdown: false });
     t.ctrl.start();
     t.sensors.fail(SensorErrorCode.GYRO_UNAVAILABLE);
-    expect(t.last()).toMatchObject({ autoCount: true, gyroAvailable: false });
+    expect(t.ctrl.snapshot().autoCount).toBe(true);
     t.sensors.fail(SensorErrorCode.ACCEL_TIMEOUT);
     expect(t.last().autoCount).toBe(false);
 
@@ -271,6 +253,7 @@ describe('WorkoutSessionController', () => {
   test('destroy releases every timer', () => {
     const t = setup({ mode: WorkoutMode.SETS, setCount: 2, targetReps: 1, restDurationSec: 30 });
     t.ctrl.start();
+    t.time.advance(3000);
     t.ctrl.destroy();
     expect(t.time.pendingTimers()).toBe(0);
   });

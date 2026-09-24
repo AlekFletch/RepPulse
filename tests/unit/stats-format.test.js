@@ -4,7 +4,8 @@ import {
 import {
   stepFor, normalizeDuration, incrementDuration, decrementDuration
 } from '../../entry/src/main/js/MainAbility/common/domain/durationSteps.js';
-import { formatDuration, roundCadence, fill } from '../../entry/src/main/js/MainAbility/common/util/format.js';
+import { formatDuration, roundCadence } from '../../entry/src/main/js/MainAbility/common/util/format.js';
+import { fill } from '../../entry/src/main/js/MainAbility/common/util/template.js';
 import { toAsciiJson, safeParse } from '../../entry/src/main/js/MainAbility/common/util/json.js';
 import { extend, clamp, indexWhere, isInteger } from '../../entry/src/main/js/MainAbility/common/util/obj.js';
 import { generateId } from '../../entry/src/main/js/MainAbility/common/util/id.js';

@@ -3,6 +3,7 @@ import { createSensorSample } from './SensorSample.js';
 import { createSensorCapabilities, SensorAvailability } from './SensorCapabilities.js';
 import { createSensorError, SensorErrorCode } from './SensorError.js';
 import { createRateMeter } from './RateMeter.js';
+import { ACCEL_G_TO_MS2 } from './units.js';
 
 /**
  * SensorProvider over the lite wearable @system.sensor API (verified against the SDK typings):
@@ -19,11 +20,7 @@ import { createRateMeter } from './RateMeter.js';
  */
 export const SensorInterval = Object.freeze({ GAME: 'game', UI: 'ui', NORMAL: 'normal' });
 
-/**
- * Watch Fit 4 Pro reports the accelerometer in g (|a| ~= 1.0 at rest, diagnostics 2026-09-24),
- * while the rest of the app works in m/s^2. The gyroscope already arrives in rad/s.
- */
-export const ACCEL_G_TO_MS2 = 9.80665;
+export { ACCEL_G_TO_MS2 };
 
 const INTERVAL_MS = { game: 20, ui: 60, normal: 200 };
 

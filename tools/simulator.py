@@ -111,6 +111,7 @@ def main():
     ap.add_argument('--url', default='pages/index/index')
     ap.add_argument('--out', default=os.path.join(tempfile.gettempdir(), 'reppulse-sim'))
     ap.add_argument('--port', type=int, default=40077)
+    ap.add_argument('--js', default=JS_DIR, help='built JS folder (default: this checkout)')
     ap.add_argument('--heap', type=int, default=102400)
     ap.add_argument('--lang', default='ru-RU',
                     help='UI language (ru-RU or en-US). The lite simulator ignores its own -l flag and always '
@@ -124,7 +125,7 @@ def main():
     run_dir = os.path.join(work, 'run')
     os.makedirs(run_dir)
     js_dir = os.path.join(work, 'js')
-    shutil.copytree(JS_DIR, js_dir)
+    shutil.copytree(a.js, js_dir)
     if a.lang != 'en-US':
         shutil.copyfile(os.path.join(js_dir, 'i18n', a.lang + '.json'), os.path.join(js_dir, 'i18n', 'en-US.json'))
 

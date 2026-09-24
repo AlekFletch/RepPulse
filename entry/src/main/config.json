@@ -68,6 +68,7 @@
           "pages/timerSetup/timerSetup",
           "pages/setsSetup/setsSetup",
           "pages/workout/workout",
+          "pages/rest/rest",
           "pages/summary/summary",
           "pages/history/history",
           "pages/historyDetail/historyDetail",

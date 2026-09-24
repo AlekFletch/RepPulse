@@ -1,63 +1,55 @@
 import router from '@system.router';
 import { BuildConfig } from '../../common/config/buildConfig.js';
-import { WorkoutMode, WorkoutStatus, SetEndReason } from '../../common/domain/enums.js';
-import { Timing } from '../../common/domain/limits.js';
-import { createWorkoutPlan } from '../../common/domain/workout.js';
-import { createNullRepDetector } from '../../common/detection/RepDetector.js';
+import { WorkoutMode, WorkoutStatus } from '../../common/domain/enums.js';
+import { createRepDetectionEngine } from '../../common/detection/RepDetectionEngine.js';
 import { createHapticsAdapter } from '../../common/platform/HapticsAdapter.js';
-import { createLogger } from '../../common/platform/Logger.js';
 import { createScreenAdapter } from '../../common/platform/ScreenAdapter.js';
 import { createSystemTimeAdapter } from '../../common/platform/TimeAdapter.js';
-import { saveLastSession } from '../../common/storage/LastSessionStore.js';
-import { exerciseIcon, exerciseKey, formatDuration, go, setIfChanged } from '../../common/ui/page.js';
+import { createMotionSensorSource } from '../../common/sensors/MotionSensorSource.js';
+import { readLastSession, saveLastSession } from '../../common/storage/LastSessionStore.js';
+import { ICON_PUSH_UP, ICON_SQUAT } from '../../common/icons/icons.js';
+import { go, setIfChanged } from '../../common/ui/nav.js';
 import { generateId } from '../../common/util/id.js';
-import { roundCadence } from '../../common/util/format.js';
+import { formatDuration, roundCadence } from '../../common/util/format.js';
 import { safeParse } from '../../common/util/json.js';
 import { createHapticFeedbackController } from '../../common/workout/HapticFeedbackController.js';
 import { createWorkoutSessionController } from '../../common/workout/WorkoutSessionController.js';
 
-/**
- * Stage 3 runs without sensors: the detection engine arrives in Stage 4, and an unused sensor
- * provider only costs JS heap (the whole page must fit in ~100 KB together with its bytecode).
- * The note on the active screen tells the user to correct reps by hand for now.
- */
-const AUTO_COUNT_READY = false;
-
 const S = WorkoutStatus;
 const time = createSystemTimeAdapter();
-const logger = createLogger('workout');
-const screen = createScreenAdapter(logger);
+const screen = createScreenAdapter(null);
 
 let controller = null;
+/** Debug builds show the detector state under the counter (phase, signal / threshold, last reason). */
+let detector = null;
 let planInput = null;
+let options = null;
 let left = false;
-/** Fixed strings looked up once. Templates go through $t(path, params) on every paint:
- * on lite, $t without params strips the {placeholders}. */
-let t = null;
 /** Exit confirmation (swipe right) is open; resumeAfterCancel: the swipe paused an active set. */
 let confirming = false;
 let resumeAfterCancel = false;
 
-function endReasonKey(reason) {
-    if (reason === SetEndReason.TARGET_REPS) {
-        return 'endedByReps';
-    }
-    return reason === SetEndReason.TIME ? 'endedByTime' : 'endedByManual';
-}
-
 /**
+ * Countdown, active set, pause, exit confirmation (spec 2.3–2.5). The rest between sets is the
+ * `rest` page: this page and the detector already use most of the ~100 KB JS heap.
+ *
  * params (ui/launch.workoutParams):
- *   planJson     plan input with the wrist and vibrationOnRep (no id yet)
- *   optionsJson  { vibrationEnabled, countdownEnabled }
+ *   planJson     the WorkoutPlan (ui/launch.workoutParams builds it)
+ *   optionsJson  { vibrationEnabled, countdownEnabled, sensitivity, profile }
+ *   resume       '1': continue the session in workouts/last.json with its next set (from `rest`)
+ *   restSec      seconds of rest to add to that session
+ *   countdown    '0': start the next set at once ("Начать сейчас")
  */
 export default {
     data: {
         planJson: '',
         optionsJson: '',
+        resume: '',
+        restSec: '',
+        countdown: '',
         vPrepare: false,
         vActive: false,
         vPaused: false,
-        vRest: false,
         vConfirm: false,
         iconHero: '',
         iconSmall: '',
@@ -68,52 +60,71 @@ export default {
         targetText: '',
         timeText: '',
         cadenceText: '',
-        noteText: '',
-        restText: '',
-        nextSetText: '',
-        lastSetText: '',
-        startNowText: ''
+        noteText: ''
     },
 
     onInit() {
         left = false;
         controller = null;
+        detector = null;
         confirming = false;
         resumeAfterCancel = false;
         planInput = safeParse(this.planJson, null);
+        options = safeParse(this.optionsJson, null) || {};
         if (!planInput) {
             this.leave('index');
             return;
         }
-        t = {
-            startNow: this.$t('strings.startNow'),
-            startNextSet: this.$t('strings.startNextSet'),
-            manual: this.$t('strings.manualCounting'),
-            soon: this.$t('strings.autoCountSoon')
-        };
-        this.iconHero = exerciseIcon(planInput.exerciseType, 64);
-        this.iconSmall = exerciseIcon(planInput.exerciseType, 28);
-        this.topText = this.$t('strings.' + exerciseKey(planInput.exerciseType));
+        const pushUps = planInput.exerciseType === 'PUSH_UP';
+        const icon = pushUps ? ICON_PUSH_UP : ICON_SQUAT;
+        this.iconHero = icon[64];
+        this.iconSmall = icon[28];
+        this.topText = this.$t(pushUps ? 'strings.pushUps' : 'strings.squats');
         screen.keepScreenOn(true);
-        this.begin(safeParse(this.optionsJson, null) || {});
+        if (this.resume !== '1') {
+            this.begin(null);
+            return;
+        }
+        const self = this;
+        const restSec = Number(this.restSec) || 0;
+        readLastSession(function (err, session) {
+            if (err || !session) {
+                console.warn('cannot continue the workout: ' + (err ? err.code : 'no session'));
+                self.leave('index');
+                return;
+            }
+            session.restDurationSec += restSec;
+            self.begin(session);
+        });
     },
 
     /** The plan was validated by the setup screen; this page only runs it. */
-    begin(options) {
+    begin(session) {
+        if (left) {
+            return;
+        }
         const now = time.now();
-        const plan = createWorkoutPlan(planInput, generateId(now), now);
+        const plan = session ? session.plan : planInput;
         const self = this;
+        detector = createRepDetectionEngine({
+            exerciseType: plan.exerciseType,
+            profile: options.profile || null,
+            sensitivity: options.sensitivity,
+            debug: BuildConfig.DEBUG
+        });
         controller = createWorkoutSessionController({
             plan: plan,
             sessionId: generateId(now),
+            session: session,
             time: time,
-            sensors: null,
-            detector: createNullRepDetector(),
-            haptics: createHapticFeedbackController(createHapticsAdapter(time, logger), {
+            sensors: createMotionSensorSource(time),
+            detector: detector,
+            haptics: createHapticFeedbackController(createHapticsAdapter(time, null), {
                 vibrationEnabled: options.vibrationEnabled !== false,
                 vibrationOnRep: plan.vibrationOnRep
             }),
-            countdownEnabled: options.countdownEnabled !== false,
+            countdownEnabled: options.countdownEnabled !== false && this.countdown !== '0',
+            calibrationProfileId: options.profile ? options.profile.id : undefined,
             onState: function (state) {
                 self.paint(state);
             }
@@ -122,8 +133,8 @@ export default {
     },
 
     paint(s) {
-        if (s.status === S.COMPLETED) {
-            this.onCompleted();
+        if (s.status === S.COMPLETED || s.status === S.RESTING) {
+            this.handOver(s);
             return;
         }
         if (s.status === S.CANCELLED) {
@@ -134,19 +145,15 @@ export default {
         setIfChanged(this, 'vPrepare', !confirming && s.status === S.PREPARING);
         setIfChanged(this, 'vActive', !confirming && s.status === S.ACTIVE);
         setIfChanged(this, 'vPaused', !confirming && s.status === S.PAUSED);
-        setIfChanged(this, 'vRest', !confirming && s.status === S.RESTING);
         setIfChanged(this, 'repsText', String(s.reps));
-
         if (s.status === S.PREPARING) {
             setIfChanged(this, 'countdownText', String(s.countdown));
         } else if (s.status === S.ACTIVE) {
-            this.renderActive(s);
-        } else if (s.status === S.RESTING) {
-            this.renderRest(s);
+            this.paintActive(s);
         }
     },
 
-    renderActive(s) {
+    paintActive(s) {
         const sets = s.mode === WorkoutMode.SETS;
         setIfChanged(this, 'setLabel', sets ? this.$t('strings.setOf', { current: s.setNumber, total: s.setCount }) : '');
         setIfChanged(this, 'targetText', s.targetReps > 0 ? this.$t('strings.repsOfTarget', { reps: s.reps, target: s.targetReps }) : '');
@@ -155,39 +162,44 @@ export default {
             : formatDuration(s.activeSec));
         setIfChanged(this, 'cadenceText', s.cadence !== undefined ? this.$t('strings.cadence', { value: roundCadence(s.cadence) }) : '');
         let note = '';
-        if (!AUTO_COUNT_READY) {
-            note = t.soon;
-        } else if (!s.autoCount) {
-            note = t.manual;
+        if (!s.autoCount) {
+            note = this.$t('strings.manualCounting');
+        } else if (BuildConfig.DEBUG && detector) {
+            note = detector.debugState();
         }
         setIfChanged(this, 'noteText', note);
     },
 
-    renderRest(s) {
-        setIfChanged(this, 'restText', formatDuration(s.restRemainingSec));
-        setIfChanged(this, 'nextSetText', this.$t('strings.nextSetOf', { current: s.setNumber, total: s.setCount }));
-        let last = '';
-        if (s.lastSet) {
-            last = this.$t('strings.setDone', { n: s.lastSet.setNumber, reps: s.lastSet.totalReps }) +
-                ' · ' + this.$t('strings.' + endReasonKey(s.lastEndedBy));
-        }
-        setIfChanged(this, 'lastSetText', last);
-        setIfChanged(this, 'startNowText', s.restDone ? t.startNextSet : t.startNow);
-    },
-
-    onCompleted() {
+    /** The set is over: save the session, then the rest page (more sets) or the summary. */
+    handOver(s) {
         if (left) {
             return;
         }
         const self = this;
+        const resting = s.status === S.RESTING;
+        const plan = controller.getSession().plan;
         saveLastSession(controller.getSession(), function (err) {
             if (err) {
-                logger.warn('saveLastSession failed ' + err.code);
+                console.warn('saveLastSession failed ' + err.code);
             }
-            self.leave('summary', {
+            if (!resting) {
+                self.leave('summary', {
+                    planJson: self.planJson,
+                    optionsJson: self.optionsJson,
+                    saveFailed: err ? 'true' : ''
+                });
+                return;
+            }
+            self.leave('rest', {
                 planJson: self.planJson,
                 optionsJson: self.optionsJson,
-                saveFailed: err ? 'true' : ''
+                exercise: plan.exerciseType,
+                restSec: String(plan.restDurationSec),
+                autoStart: plan.autoStartNextSet ? '1' : '',
+                nextSet: String(s.setNumber),
+                setCount: String(s.setCount),
+                lastReps: String(s.lastSet ? s.lastSet.totalReps : 0),
+                endedBy: s.lastEndedBy || ''
             });
         });
     },
@@ -201,6 +213,17 @@ export default {
         if (controller !== null) {
             controller.destroy();
         }
+        // Drop every reference into this page's closures before the next page loads: the JS heap
+        // (~100 KB) cannot hold this page's code and the next one's at the same time.
+        controller = null;
+        detector = null;
+        planInput = null;
+        options = null;
+        // ...and drop the visible view (built with `if`): its elements go before the next page.
+        this.vPrepare = false;
+        this.vActive = false;
+        this.vPaused = false;
+        this.vConfirm = false;
         go(router, null, page, params);
     },
 
@@ -228,23 +251,6 @@ export default {
         }
     },
 
-    startNow() {
-        if (!controller) {
-            return;
-        }
-        if (controller.snapshot().restDone) {
-            controller.startNextSet();
-        } else {
-            controller.startNow();
-        }
-    },
-
-    extendRest() {
-        if (controller) {
-            controller.extendRest(Timing.REST_EXTEND_SEC);
-        }
-    },
-
     finish() {
         if (controller) {
             controller.finish();
@@ -257,7 +263,7 @@ export default {
             return;
         }
         const status = controller.getStatus();
-        if (status === S.COMPLETED || status === S.CANCELLED) {
+        if (status === S.COMPLETED || status === S.CANCELLED || status === S.RESTING) {
             return;
         }
         resumeAfterCancel = status === S.ACTIVE || status === S.PREPARING;
@@ -286,7 +292,7 @@ export default {
         }
     },
 
-    /** Debug builds: tapping the counter stands in for a detected rep (no detector until Stage 4). */
+    /** Debug builds: tapping the counter stands in for a detected rep. */
     onCounterTap() {
         if (BuildConfig.DEBUG && controller) {
             controller.simulateRep();

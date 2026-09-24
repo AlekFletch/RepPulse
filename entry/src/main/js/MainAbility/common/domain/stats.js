@@ -72,3 +72,21 @@ export function computeSessionTotals(session) {
     avgConfidence: weightedConfidence(session.sets)
   };
 }
+
+/**
+ * Marks a session finished at `finishedAtMs` and stores its totals (spec 4.2) on it: used when the
+ * last set ends on the workout page and when the workout is finished from the rest page.
+ */
+export function finalizeSession(session, finishedAtMs) {
+  session.finishedAt = finishedAtMs;
+  const totals = computeSessionTotals(session);
+  session.totalReps = totals.totalReps;
+  session.totalAutoReps = totals.totalAutoReps;
+  session.totalManualAdjustment = totals.totalManualAdjustment;
+  session.activeDurationSec = totals.activeDurationSec;
+  if (totals.averageCadence !== undefined) {
+    session.averageCadence = totals.averageCadence;
+  }
+  session.status = 'COMPLETED';
+  return session;
+}

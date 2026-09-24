@@ -1,0 +1,33 @@
+<!-- RestScreen (spec 2.5): its own page, the workout page has no heap left for it. -->
+<div class="page" onswipe="onSwipe">
+    <div class="view" if="{{vRest}}">
+        <text class="caption">{{ $t('strings.rest') }}</text>
+        <text class="rest-timer">{{restText}}</text>
+        <text class="line">{{nextSetText}}</text>
+        <text class="line-two">{{lastSetText}}</text>
+        <div class="row">
+            <div class="half-accent" onclick="startNow">
+                <text class="half-accent-text">{{startNowText}}</text>
+            </div>
+            <div class="half" onclick="extendRest">
+                <text class="half-text">{{ $t('strings.plusRest') }}</text>
+            </div>
+        </div>
+        <div class="button-dark" onclick="finish">
+            <text class="button-dark-text">{{ $t('strings.finishWorkout') }}</text>
+        </div>
+    </div>
+
+    <div class="view" if="{{vConfirm}}">
+        <text class="caption-wide">{{ $t('strings.exitWorkoutConfirm') }}</text>
+        <text class="line-two">{{ $t('strings.exitWorkoutHint') }}</text>
+        <div class="row">
+            <div class="half" onclick="cancelExit">
+                <text class="half-text">{{ $t('strings.no') }}</text>
+            </div>
+            <div class="half-danger" onclick="finish">
+                <text class="half-danger-text">{{ $t('strings.yes') }}</text>
+            </div>
+        </div>
+    </div>
+</div>

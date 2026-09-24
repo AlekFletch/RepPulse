@@ -2,8 +2,7 @@ import router from '@system.router';
 import { ExerciseType, WorkoutMode } from '../../common/domain/enums.js';
 import { Defaults, Limits } from '../../common/domain/limits.js';
 import { createSystemStorageAdapter } from '../../common/storage/LocalStorageAdapter.js';
-import { createSettingsRepository } from '../../common/storage/SettingsRepository.js';
-import { workoutParams } from '../../common/ui/launch.js';
+import { loadLaunchData, workoutParams } from '../../common/ui/launch.js';
 import { createDefaultSettings } from '../../common/domain/models.js';
 import { exerciseIcon, focusRotation, formatDuration, go, isExercise, setIfChanged } from '../../common/ui/page.js';
 import {
@@ -16,6 +15,7 @@ let workSec = OFF;
 let restSec = Defaults.REST_DURATION_SEC;
 
 let settings = createDefaultSettings();
+let profile = null;
 
 /** params: exercise. */
 export default {
@@ -44,9 +44,13 @@ export default {
         this.paint();
         const self = this;
         settings = createDefaultSettings();
-        createSettingsRepository(createSystemStorageAdapter()).load(function (err, loaded) {
+        profile = null;
+        loadLaunchData(createSystemStorageAdapter(), this.exercise, function (loaded, found) {
+            if (found === null) {
+                self.vibrationOnRep = loaded.vibrationOnRep;
+            }
             settings = loaded;
-            self.vibrationOnRep = loaded.vibrationOnRep;
+            profile = found;
         });
     },
 
@@ -100,7 +104,7 @@ export default {
             this.hasError = true;
             return;
         }
-        go(router, this.$refs.list, 'workout', workoutParams(withoutOffGoals(input), settings));
+        go(router, this.$refs.list, 'workout', workoutParams(withoutOffGoals(input), settings, profile));
     },
 
     goBack() {

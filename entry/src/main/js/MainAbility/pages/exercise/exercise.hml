@@ -14,6 +14,9 @@
         <list-item class="hint-item-long" if="{{pushUps}}">
             <text class="hint-long">{{ $t('strings.pushUpAccuracyHint') }}</text>
         </list-item>
+        <list-item class="hint-item" if="{{needsCalibration}}">
+            <text class="calib-hint">{{ $t('strings.calibrationHint') }}</text>
+        </list-item>
         <list-item class="warn-item" if="{{lowBattery}}">
             <text class="warn">{{ $t('strings.lowBattery') }}</text>
         </list-item>

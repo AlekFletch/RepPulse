@@ -5,6 +5,19 @@
     align-items: center;
     background-color: #050A1F;
 }
+.view {
+    width: 408px;
+    height: 480px;
+    flex-direction: column;
+    align-items: center;
+}
+.view-center {
+    width: 408px;
+    height: 480px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
 .list {
     width: 360px;
     height: 480px;
@@ -87,15 +100,95 @@
     font-size: 22px;
     color: #FFFFFF;
 }
-.note-item {
+.start {
     width: 360px;
     height: 80px;
+    margin-top: 10px;
+    margin-bottom: 20px;
     justify-content: center;
+    align-items: center;
+    border-radius: 40px;
+    background-color: #2DE3C4;
 }
-.note {
+.start-text {
+    width: 320px;
+    height: 40px;
+    font-size: 30px;
+    text-align: center;
+    color: #04101F;
+}
+.caption-center {
     width: 360px;
-    height: 70px;
-    font-size: 22px;
+    height: 44px;
+    font-size: 28px;
+    text-align: center;
+    color: #8A93B8;
+}
+.countdown {
+    width: 360px;
+    height: 150px;
+    font-size: 140px;
     text-align: center;
     color: #B8F34A;
+}
+.big {
+    width: 360px;
+    height: 130px;
+    font-size: 120px;
+    text-align: center;
+    color: #FFFFFF;
+}
+.progress-text {
+    width: 360px;
+    height: 40px;
+    font-size: 26px;
+    text-align: center;
+    color: #B8F34A;
+}
+.finish {
+    width: 320px;
+    height: 72px;
+    margin-top: 20px;
+    justify-content: center;
+    align-items: center;
+    border-radius: 36px;
+    background-color: #2DE3C4;
+}
+.finish-text {
+    width: 290px;
+    height: 38px;
+    font-size: 28px;
+    text-align: center;
+    color: #04101F;
+}
+.result-title {
+    width: 360px;
+    height: 44px;
+    font-size: 30px;
+    text-align: center;
+    color: #B8F34A;
+}
+.result-text {
+    width: 350px;
+    height: 124px;
+    margin-top: 10px;
+    font-size: 22px;
+    text-align: center;
+    color: #FFFFFF;
+}
+.back-wide {
+    width: 320px;
+    height: 64px;
+    margin-top: 10px;
+    justify-content: center;
+    align-items: center;
+    border-radius: 32px;
+    background-color: #0E1638;
+}
+.back-wide-text {
+    width: 300px;
+    height: 34px;
+    font-size: 24px;
+    text-align: center;
+    color: #FFFFFF;
 }

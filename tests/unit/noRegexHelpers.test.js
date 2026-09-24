@@ -2,7 +2,7 @@
  * The watch has no RegExp (install error 34), so these helpers were rewritten with loops.
  * Here they are checked against the original regex implementations (Node has RegExp).
  */
-import { fill } from '../../entry/src/main/js/MainAbility/common/util/format.js';
+import { fill } from '../../entry/src/main/js/MainAbility/common/util/template.js';
 import { toAsciiJson } from '../../entry/src/main/js/MainAbility/common/util/json.js';
 import { toUri } from '../../entry/src/main/js/MainAbility/common/storage/paths.js';
 

@@ -87,7 +87,6 @@
     "endedByManual": "Завершён вручную",
     "setDone": "Подход {n}: {reps} повт.",
     "manualCounting": "Ручной подсчёт: исправьте повторы на паузе",
-    "autoCountSoon": "Автоподсчёт появится на Этапе 4. Пока исправляйте повторы на паузе",
     "exercise": "Упражнение",
     "mode": "Режим",
     "totalReps": "Всего повторов",
@@ -116,10 +115,14 @@
     "sensLow": "Низкая",
     "sensStandard": "Обычная",
     "sensHigh": "Высокая",
-    "calibrationSoon": "Калибровка появится на Этапе 4",
     "setsCount": "{n} подх.",
     "repsCount": "{n} повт.",
     "exitWorkoutConfirm": "Завершить тренировку?",
-    "exitWorkoutHint": "Сделанные подходы попадут в итоги"
+    "exitWorkoutHint": "Сделанные подходы попадут в итоги",
+    "calibReps": "Повторов: {n} из {max}",
+    "calibFinish": "Готово",
+    "calibRetry": "Ещё раз",
+    "calibRecording": "Выполняйте повторы",
+    "calibSaved": "Профиль сохранён для руки: {wrist}"
   }
 }

@@ -9,7 +9,8 @@ import {
 } from './enums.js';
 import { Limits } from './limits.js';
 import { ALGORITHM_VERSION } from '../detection/version.js';
-import { createWorkoutPlan, plannedSetCount, createWorkoutSession, createSetResult } from './workout.js';
+import { plannedSetCount, createWorkoutSession, createSetResult } from './workout.js';
+import { createWorkoutPlan } from './plan.js';
 import { getBaseline } from '../detection/DetectionConfig.js';
 
 export { createWorkoutPlan, plannedSetCount, createWorkoutSession, createSetResult };

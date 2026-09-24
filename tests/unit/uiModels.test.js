@@ -3,7 +3,7 @@ import {
   OFF, stepDuration, stepOptionalDuration, stepSetCount, stepTargetReps, validateSetup, withoutOffGoals
 } from '../../entry/src/main/js/MainAbility/common/ui/setupSteps.js';
 import { setRows, summaryRows } from '../../entry/src/main/js/MainAbility/common/ui/summaryView.js';
-import { fill } from '../../entry/src/main/js/MainAbility/common/util/format.js';
+import { fill } from '../../entry/src/main/js/MainAbility/common/util/template.js';
 import { formatDateTime } from '../../entry/src/main/js/MainAbility/common/ui/page.js';
 
 describe('setup steppers', () => {
