@@ -1,6 +1,9 @@
 /** All app files live under internal://app/ (URI max 128 chars, no *+,:;<=>?[]| characters). */
 export const APP_ROOT = 'internal://app/';
 const MAX_URI_LENGTH = 128;
+
+/** @system.storage value limit: the watch rejects 200 characters with 202 (diagnostics 2026-09-24). */
+export const MAX_KV_VALUE_LENGTH = 128;
 const FORBIDDEN_CHARS = '*+,:;<=>?[]|"\\';
 
 function hasForbiddenChar(text) {

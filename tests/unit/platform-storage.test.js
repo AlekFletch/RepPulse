@@ -123,6 +123,9 @@ describe.each([
     await call(s.removeItem, 'k');
     expect((await call(s.getItem, 'k')).value).toBeNull();
     expect((await call(s.setItem, 'k', '')).err).not.toBeNull();
+    const max = new Array(129).join('x');
+    expect((await call(s.setItem, 'k', max)).err).toBeNull();
+    expect((await call(s.setItem, 'k', max + 'x')).err.code).toBe('VALUE_TOO_LONG');
   });
 
   test('files: write, read, list, remove, not-found', async () => {

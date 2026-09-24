@@ -5,7 +5,7 @@ import { createHapticsAdapter, HapticMode } from '../../common/platform/HapticsA
 import { createScreenAdapter } from '../../common/platform/ScreenAdapter.js';
 import { createHuaweiSensorProvider } from '../../common/sensors/HuaweiSensorProvider.js';
 import { SensorAvailability } from '../../common/sensors/SensorCapabilities.js';
-import { createSystemStorageAdapter } from '../../common/storage/LocalStorageAdapter.js';
+import { createSystemStorageAdapter, MAX_KV_VALUE_LENGTH } from '../../common/storage/LocalStorageAdapter.js';
 import { toAsciiJson } from '../../common/util/json.js';
 
 /**
@@ -139,22 +139,23 @@ export default {
         });
     },
 
-    /** Checks whether a 200-character value survives @system.storage. */
+    /** Checks that a value of MAX_KV_VALUE_LENGTH (128) characters survives @system.storage. */
     storageTest() {
         const self = this;
         let value = '';
-        for (let i = 0; i < 20; i++) {
+        while (value.length < MAX_KV_VALUE_LENGTH) {
             value += '0123456789';
         }
-        storageAdapter.setItem('diag_len200', value, function (err) {
+        value = value.slice(0, MAX_KV_VALUE_LENGTH);
+        storageAdapter.setItem('diag_kv_max', value, function (err) {
             if (err) {
-                self.resultLine = 'kv set 200: ' + err.message;
+                self.resultLine = 'kv set ' + value.length + ': ' + err.message;
                 return;
             }
-            storageAdapter.getItem('diag_len200', function (getErr, back) {
+            storageAdapter.getItem('diag_kv_max', function (getErr, back) {
                 const ok = !getErr && back === value;
                 self.resultLine = (ok ? self.$t('strings.diagOk') : self.$t('strings.diagFail')) +
-                    ' kv ' + (back ? back.length : 0) + '/200';
+                    ' kv ' + (back ? back.length : 0) + '/' + value.length;
             });
         });
     },

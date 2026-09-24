@@ -2,6 +2,7 @@ export const StorageErrorCode = Object.freeze({
   NOT_FOUND: 'NOT_FOUND',
   IO: 'IO',
   INVALID_PATH: 'INVALID_PATH',
+  VALUE_TOO_LONG: 'VALUE_TOO_LONG',
   UNKNOWN: 'UNKNOWN'
 });
 

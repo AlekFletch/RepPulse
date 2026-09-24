@@ -24,7 +24,8 @@ function stream(time, ms, withGyro) {
     if (withGyro) {
       sensor.__emit('Gyroscope', { x: 0.1, y: 0.2, z: 0.3 });
     }
-    sensor.__emit('Accelerometer', { x: 0, y: 0, z: 9.81 });
+    // The watch reports the accelerometer in g.
+    sensor.__emit('Accelerometer', { x: 0.1, y: 0, z: 1 });
   }
 }
 
@@ -41,7 +42,9 @@ describe('HuaweiSensorProvider (@system.sensor)', () => {
     const { time, samples, provider } = setup();
     stream(time, 1000, true);
     expect(samples.length).toBe(50);
-    expect(samples[10]).toMatchObject({ az: 9.81, gx: 0.1, gy: 0.2, gz: 0.3, hasGyro: true });
+    expect(samples[10]).toMatchObject({ ay: 0, gx: 0.1, gy: 0.2, gz: 0.3, hasGyro: true });
+    expect(samples[10].ax).toBeCloseTo(0.980665, 6);
+    expect(samples[10].az).toBeCloseTo(9.80665, 6);
     const caps = provider.getCapabilities();
     expect(caps.accelerometer).toBe(SensorAvailability.AVAILABLE);
     expect(caps.gyroscope).toBe(SensorAvailability.AVAILABLE);

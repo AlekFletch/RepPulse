@@ -1,4 +1,4 @@
-import { toUri } from './paths.js';
+import { toUri, MAX_KV_VALUE_LENGTH } from './paths.js';
 import { storageError, StorageErrorCode } from './StorageError.js';
 
 /**
@@ -41,6 +41,10 @@ export function createInMemoryStorageAdapter() {
       if (rejected(cb)) { return; }
       if (typeof value !== 'string' || value.length === 0) {
         cb(storageError(StorageErrorCode.UNKNOWN, 'only non-empty strings can be stored'));
+        return;
+      }
+      if (value.length > MAX_KV_VALUE_LENGTH) {
+        cb(storageError(StorageErrorCode.VALUE_TOO_LONG, value.length + ' > ' + MAX_KV_VALUE_LENGTH));
         return;
       }
       kv[key] = value;

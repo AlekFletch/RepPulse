@@ -1,6 +1,6 @@
 import storage from '@system.storage';
 import file from '@system.file';
-import { toUri } from './paths.js';
+import { toUri, MAX_KV_VALUE_LENGTH } from './paths.js';
 import { fromFileFailure, storageError, StorageErrorCode } from './StorageError.js';
 
 /**
@@ -12,10 +12,12 @@ import { fromFileFailure, storageError, StorageErrorCode } from './StorageError.
  * Paths are relative to internal://app/. Key-value storage is for small values (settings);
  * larger records (workouts, calibration) go to files as ASCII JSON (see util/json.js).
  *
- * TODO(device): verify the @system.storage value length limit on Watch Fit 4 (OpenHarmony
- * docs mention 128 bytes) and readText position/length semantics.
+ * On Watch Fit 4 Pro storage.set rejects a 200-character value with "202 Invalid parameter"
+ * (diagnostics 2026-09-24); OpenHarmony documents 128 bytes, so longer values are refused
+ * here. Chunked file reads over 4 KB were confirmed on the watch.
  */
 export const READ_CHUNK = 4096;
+export { MAX_KV_VALUE_LENGTH };
 const MISSING = '';
 
 export function createSystemStorageAdapter() {
@@ -65,6 +67,10 @@ export function createSystemStorageAdapter() {
     setItem: function (key, value, cb) {
       if (typeof value !== 'string' || value.length === 0) {
         cb(storageError(StorageErrorCode.UNKNOWN, 'only non-empty strings can be stored'));
+        return;
+      }
+      if (value.length > MAX_KV_VALUE_LENGTH) {
+        cb(storageError(StorageErrorCode.VALUE_TOO_LONG, value.length + ' > ' + MAX_KV_VALUE_LENGTH));
         return;
       }
       try {

@@ -19,6 +19,12 @@ import { createRateMeter } from './RateMeter.js';
  */
 export const SensorInterval = Object.freeze({ GAME: 'game', UI: 'ui', NORMAL: 'normal' });
 
+/**
+ * Watch Fit 4 Pro reports the accelerometer in g (|a| ~= 1.0 at rest, diagnostics 2026-09-24),
+ * while the rest of the app works in m/s^2. The gyroscope already arrives in rad/s.
+ */
+export const ACCEL_G_TO_MS2 = 9.80665;
+
 const INTERVAL_MS = { game: 20, ui: 60, normal: 200 };
 
 export function createHuaweiSensorProvider(time, logger, options) {
@@ -67,7 +73,7 @@ export function createHuaweiSensorProvider(time, logger, options) {
     const gyroFresh = lastGyro !== null && t - lastGyro.t <= gyroMaxAgeMs;
     const g = gyroFresh ? lastGyro : null;
     onSampleCb(createSensorSample(
-      t, data.x, data.y, data.z,
+      t, data.x * ACCEL_G_TO_MS2, data.y * ACCEL_G_TO_MS2, data.z * ACCEL_G_TO_MS2,
       g ? g.x : 0, g ? g.y : 0, g ? g.z : 0,
       gyroFresh
     ));

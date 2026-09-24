@@ -4,8 +4,8 @@ import { ExerciseType, Sensitivity } from '../domain/enums.js';
  * Conservative baseline thresholds used when the user has no calibration profile.
  *
  * NOTE: these are starting values for Stage 4 and must be tuned on real Watch Fit 4
- * sensor logs. Units assume accelerometer in m/s^2 and gyroscope in rad/s —
- * TODO(device): the @system.sensor typings do not document units; verify on the watch.
+ * sensor logs. Units: accelerometer in m/s^2 (the watch reports g; HuaweiSensorProvider
+ * converts), gyroscope in rad/s — both checked on the watch on 2026-09-24.
  */
 const BASELINES = {};
 
