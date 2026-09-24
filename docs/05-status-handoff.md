@@ -57,11 +57,11 @@
 - **Сборка из консоли** (DevEco при этом можно не открывать):
   ```bash
   export DEVECO_SDK_HOME="C:/Program Files/Huawei/DevEco Studio/sdk"
-  "/c/Program Files/Huawei/DevEco Studio/tools/node/node.exe" "/c/Program Files/Huawei/DevEco Studio/tools/hvigor/bin/hvigorw.js" --mode module -p module=entry@default -p product=default -p buildMode=release assembleHap --no-daemon
+  "/c/Program Files/Huawei/DevEco Studio/tools/node/node.exe" "/c/Program Files/Huawei/DevEco Studio/tools/hvigor/bin/hvigorw.js" --mode module -p module=entry@default -p product=default assembleHap --no-daemon
   npm run check:bundles
   ```
   Результат: `entry/build/default/outputs/default/entry-default-signed.hap`. Перед сборкой удаляйте `entry/build`, иначе в пакет могут попасть старые файлы.
-- **Для часов собираем только release (`-p buildMode=release`).** SDK минифицирует JS только в release, а страница больше 48 КБ на часах не откроется (см. [06 §3](06-stage3.md)). Release-пакет подписывается тем же debug-профилем. `BuildConfig.DEBUG` от режима сборки не зависит: «Диагностика» и имитация повтора касанием остаются, пока `DEBUG = true`.
+- **Сборка обычная, debug, но JS в ней минифицирован.** Страница больше 48 КБ на часах не откроется (см. [06 §3](06-stage3.md)). SDK сам минифицирует JS только в release, а release-пакет DevEco Assistant не ставит: *Failed to decompress*. Поэтому в `entry/hvigorfile.ts` добавлена задача `RepPulseMinifyLiteJS`: между компиляцией JS и упаковкой в `.bin` она прогоняет `tools/minify-lite.js` (terser из SDK с настройками release). Это работает и в DevEco, и из консоли. `npm run check:bundles` проверяет размеры.
 
 ---
 

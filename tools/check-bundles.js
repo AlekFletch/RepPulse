@@ -3,8 +3,9 @@
  * 48 KB (FILE_CONTENT_LENGTH_MAX in ArkUI ACE lite, "PAGE_FILE_TOO_HUGE"), and a big page also
  * eats the ~100 KB JS heap. Run after a build: npm run check:bundles
  *
- * Only the release build is minified by the SDK (hvigor sets hapMode = !debug), so the HAP for the
- * watch is built with -p buildMode=release; this script checks whatever the last build produced.
+ * The SDK minifies only release builds, which DevEco Assistant cannot install, so the debug build
+ * is minified by the RepPulseMinifyLiteJS task (entry/hvigorfile.ts, tools/minify-lite.js).
+ * This script checks whatever the last build produced.
  */
 const fs = require('fs');
 const path = require('path');
@@ -42,7 +43,7 @@ for (const page of fs.readdirSync(pagesDir)) {
 }
 rows.sort((a, b) => b.kb - a.kb);
 for (const r of rows) {
-  console.log(r.page.padEnd(16) + (r.kb + ' KB').padStart(9) + (r.minified ? '' : '  (not minified: debug build)') +
+  console.log(r.page.padEnd(16) + (r.kb + ' KB').padStart(9) + (r.minified ? '' : '  (not minified!)') +
     '  ' + r.status);
 }
 if (failed) {
