@@ -181,3 +181,25 @@
     text-align: center;
     color: #8A93B8;
 }
+.caption-wide {
+    width: 380px;
+    height: 44px;
+    font-size: 28px;
+    text-align: center;
+    color: #FFFFFF;
+}
+.half-danger {
+    width: 162px;
+    height: 72px;
+    justify-content: center;
+    align-items: center;
+    border-radius: 24px;
+    background-color: #FF8A7A;
+}
+.half-danger-text {
+    width: 150px;
+    height: 34px;
+    font-size: 24px;
+    text-align: center;
+    color: #04101F;
+}

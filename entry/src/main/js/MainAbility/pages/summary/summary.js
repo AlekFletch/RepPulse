@@ -92,5 +92,11 @@ export default {
 
     goHome() {
         go(router, this.$refs.list, 'index');
+    },
+
+    onSwipe(e) {
+        if (e && e.direction === 'right') {
+            this.goHome();
+        }
     }
 };

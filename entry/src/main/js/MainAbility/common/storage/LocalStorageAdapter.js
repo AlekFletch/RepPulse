@@ -18,6 +18,8 @@ import { fromFileFailure, storageError, StorageErrorCode } from './StorageError.
  */
 export const READ_CHUNK = 4096;
 export { MAX_KV_VALUE_LENGTH };
+/** Longest wait for storage.get/set before the call settles on its own. */
+export const KV_TIMEOUT_MS = 1500;
 const MISSING = '';
 
 export function createSystemStorageAdapter() {
@@ -56,8 +58,30 @@ export function createSystemStorageAdapter() {
     };
   }
 
+  /**
+   * cb that fires at most once, and by itself after KV_TIMEOUT_MS with timeoutArgs: a storage
+   * callback that never arrives must not block a page ("Свободный режим" did nothing on the watch).
+   */
+  function once(cb, timeoutArgs) {
+    let done = false;
+    const timer = setTimeout(function () {
+      if (!done) {
+        done = true;
+        cb.apply(null, timeoutArgs);
+      }
+    }, KV_TIMEOUT_MS);
+    return function () {
+      if (!done) {
+        done = true;
+        clearTimeout(timer);
+        cb.apply(null, arguments);
+      }
+    };
+  }
+
   return {
-    getItem: function (key, cb) {
+    getItem: function (key, done) {
+      const cb = once(done, [null, null]);
       let fail = null;
       function attempt() {
         storage.get({
@@ -79,7 +103,8 @@ export function createSystemStorageAdapter() {
       }
     },
 
-    setItem: function (key, value, cb) {
+    setItem: function (key, value, done) {
+      const cb = once(done, [storageError(StorageErrorCode.IO, 'storage.set timeout')]);
       if (typeof value !== 'string' || value.length === 0) {
         cb(storageError(StorageErrorCode.UNKNOWN, 'only non-empty strings can be stored'));
         return;

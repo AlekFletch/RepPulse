@@ -118,6 +118,8 @@
     "sensHigh": "High",
     "calibrationSoon": "Calibration arrives in Stage 4",
     "setsCount": "{n} sets",
-    "repsCount": "{n} reps"
+    "repsCount": "{n} reps",
+    "exitWorkoutConfirm": "Finish the workout?",
+    "exitWorkoutHint": "Completed sets go to the summary"
   }
 }

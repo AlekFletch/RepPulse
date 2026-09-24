@@ -112,6 +112,9 @@ def main():
     ap.add_argument('--out', default=os.path.join(tempfile.gettempdir(), 'reppulse-sim'))
     ap.add_argument('--port', type=int, default=40077)
     ap.add_argument('--heap', type=int, default=102400)
+    ap.add_argument('--lang', default='ru-RU',
+                    help='UI language (ru-RU or en-US). The lite simulator ignores its own -l flag and always '
+                         'uses en-US, so for ru-RU the copied bundle gets ru-RU.json in place of en-US.json')
     ap.add_argument('steps', nargs='*')
     a = ap.parse_args()
 
@@ -120,11 +123,15 @@ def main():
     shutil.copytree(os.path.join(PREVIEWER, 'config'), os.path.join(work, 'config'))
     run_dir = os.path.join(work, 'run')
     os.makedirs(run_dir)
+    js_dir = os.path.join(work, 'js')
+    shutil.copytree(JS_DIR, js_dir)
+    if a.lang != 'en-US':
+        shutil.copyfile(os.path.join(js_dir, 'i18n', a.lang + '.json'), os.path.join(js_dir, 'i18n', 'en-US.json'))
 
     name = 'reppulse' + uuid.uuid4().hex[:6]
     sid = uuid.uuid4().hex
     pipe = CommandPipe(name)
-    cmd = [SIMULATOR, '-j', JS_DIR, '-s', name, '-n', 'entry', '-device', 'liteWearable',
+    cmd = [SIMULATOR, '-j', js_dir, '-s', name, '-n', 'entry', '-device', 'liteWearable',
            '-shape', 'rect', '-or', '408', '480', '-cr', '408', '480', '-lws', str(a.port),
            '-sid', sid, '-hs', str(a.heap), '-url', a.url]
     proc = subprocess.Popen(cmd, cwd=run_dir, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)

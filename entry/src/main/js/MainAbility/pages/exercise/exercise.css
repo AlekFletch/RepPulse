@@ -43,15 +43,28 @@
     font-size: 30px;
     color: #FFFFFF;
 }
+/* Lite text never grows its box: heights leave room for the Russian texts wrapped by words on
+   the watch (4 and 5 lines of 20 px); too small a box draws the text over the buttons below. */
 .hint-item {
     width: 360px;
-    height: 96px;
+    height: 118px;
+    justify-content: center;
+}
+.hint-item-long {
+    width: 360px;
+    height: 148px;
     justify-content: center;
 }
 .hint {
     width: 360px;
-    height: 90px;
-    font-size: 22px;
+    height: 112px;
+    font-size: 20px;
+    color: #8A93B8;
+}
+.hint-long {
+    width: 360px;
+    height: 142px;
+    font-size: 20px;
     color: #8A93B8;
 }
 .warn-item {

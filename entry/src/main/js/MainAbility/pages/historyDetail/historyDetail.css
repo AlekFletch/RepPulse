@@ -50,15 +50,15 @@
     align-items: center;
 }
 .row-label {
-    width: 200px;
+    width: 165px;
     height: 32px;
-    font-size: 20px;
+    font-size: 19px;
     color: #8A93B8;
 }
 .row-value {
-    width: 160px;
+    width: 195px;
     height: 32px;
-    font-size: 22px;
+    font-size: 21px;
     text-align: right;
     color: #FFFFFF;
 }

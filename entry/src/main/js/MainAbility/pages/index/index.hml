@@ -1,5 +1,5 @@
 <!-- HomeScreen (spec 2.1): brand icon + "Тренировка", three equal tiles, settings. -->
-<div class="page">
+<div class="page" onswipe="onSwipe">
     <list class="list" ref="list">
         <list-item class="header">
             <image class="app-icon" src="/common/icons/reppulse_app_icon_48.png"></image>

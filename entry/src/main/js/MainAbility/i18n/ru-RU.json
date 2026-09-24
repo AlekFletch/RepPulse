@@ -118,6 +118,8 @@
     "sensHigh": "Высокая",
     "calibrationSoon": "Калибровка появится на Этапе 4",
     "setsCount": "{n} подх.",
-    "repsCount": "{n} повт."
+    "repsCount": "{n} повт.",
+    "exitWorkoutConfirm": "Завершить тренировку?",
+    "exitWorkoutHint": "Сделанные подходы попадут в итоги"
   }
 }

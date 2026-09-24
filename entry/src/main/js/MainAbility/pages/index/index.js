@@ -1,3 +1,4 @@
+import app from '@system.app';
 import router from '@system.router';
 import { BuildConfig } from '../../common/config/buildConfig.js';
 import { ExerciseType } from '../../common/domain/enums.js';
@@ -34,5 +35,13 @@ export default {
 
     openDiagnostics() {
         this.leave('diagnostics');
+    },
+
+    /** Swipe right on the home screen closes the app (crown focus released first). */
+    onSwipe(e) {
+        if (e && e.direction === 'right') {
+            focusRotation(this.$refs.list, false);
+            app.terminate();
+        }
     }
 };

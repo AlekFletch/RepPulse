@@ -34,6 +34,9 @@ let left = false;
 /** Fixed strings looked up once. Templates go through $t(path, params) on every paint:
  * on lite, $t without params strips the {placeholders}. */
 let t = null;
+/** Exit confirmation (swipe right) is open; resumeAfterCancel: the swipe paused an active set. */
+let confirming = false;
+let resumeAfterCancel = false;
 
 function endReasonKey(reason) {
     if (reason === SetEndReason.TARGET_REPS) {
@@ -55,6 +58,7 @@ export default {
         vActive: false,
         vPaused: false,
         vRest: false,
+        vConfirm: false,
         iconHero: '',
         iconSmall: '',
         countdownText: '',
@@ -74,6 +78,8 @@ export default {
     onInit() {
         left = false;
         controller = null;
+        confirming = false;
+        resumeAfterCancel = false;
         planInput = safeParse(this.planJson, null);
         if (!planInput) {
             this.leave('index');
@@ -124,10 +130,11 @@ export default {
             this.leave('index');
             return;
         }
-        setIfChanged(this, 'vPrepare', s.status === S.PREPARING);
-        setIfChanged(this, 'vActive', s.status === S.ACTIVE);
-        setIfChanged(this, 'vPaused', s.status === S.PAUSED);
-        setIfChanged(this, 'vRest', s.status === S.RESTING);
+        setIfChanged(this, 'vConfirm', confirming);
+        setIfChanged(this, 'vPrepare', !confirming && s.status === S.PREPARING);
+        setIfChanged(this, 'vActive', !confirming && s.status === S.ACTIVE);
+        setIfChanged(this, 'vPaused', !confirming && s.status === S.PAUSED);
+        setIfChanged(this, 'vRest', !confirming && s.status === S.RESTING);
         setIfChanged(this, 'repsText', String(s.reps));
 
         if (s.status === S.PREPARING) {
@@ -239,6 +246,41 @@ export default {
     },
 
     finish() {
+        if (controller) {
+            controller.finish();
+        }
+    },
+
+    /** Swipe right: pause and ask "Завершить тренировку?" instead of leaving at once. */
+    onSwipe(e) {
+        if (!e || e.direction !== 'right' || !controller || confirming) {
+            return;
+        }
+        const status = controller.getStatus();
+        if (status === S.COMPLETED || status === S.CANCELLED) {
+            return;
+        }
+        resumeAfterCancel = status === S.ACTIVE || status === S.PREPARING;
+        confirming = true;
+        controller.pause();
+        this.paint(controller.snapshot());
+    },
+
+    cancelExit() {
+        confirming = false;
+        if (!controller) {
+            return;
+        }
+        if (resumeAfterCancel) {
+            controller.resume();
+        } else {
+            this.paint(controller.snapshot());
+        }
+    },
+
+    /** Completed sets go to the summary; with nothing done the controller cancels -> home. */
+    confirmExit() {
+        confirming = false;
         if (controller) {
             controller.finish();
         }

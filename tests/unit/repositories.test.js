@@ -1,7 +1,7 @@
 import storage from '@system.storage';
 import file from '@system.file';
 import { createInMemoryStorageAdapter } from '../../entry/src/main/js/MainAbility/common/storage/InMemoryStorageAdapter.js';
-import { createSystemStorageAdapter } from '../../entry/src/main/js/MainAbility/common/storage/LocalStorageAdapter.js';
+import { createSystemStorageAdapter, KV_TIMEOUT_MS } from '../../entry/src/main/js/MainAbility/common/storage/LocalStorageAdapter.js';
 import { createWorkoutRepository, MAX_HISTORY } from '../../entry/src/main/js/MainAbility/common/storage/WorkoutRepository.js';
 import { createSettingsRepository } from '../../entry/src/main/js/MainAbility/common/storage/SettingsRepository.js';
 import { createCalibrationRepository } from '../../entry/src/main/js/MainAbility/common/storage/CalibrationRepository.js';
@@ -81,6 +81,29 @@ describe('SettingsRepository', () => {
     await call(repo.set, 'vibrationOnRep', false);
     const loaded = (await call(repo.load)).value;
     expect(loaded).toMatchObject({ wristSide: 'RIGHT', sensitivity: 'HIGH', vibrationOnRep: false });
+  });
+
+  test('storage that never answers settles after the timeout; settings fall back to defaults', () => {
+    jest.useFakeTimers();
+    try {
+      const adapter = createSystemStorageAdapter();
+      const got = [];
+      storage.__silentNext(1);
+      adapter.getItem('k', (err, value) => got.push(['get', err, value]));
+      storage.__silentNext(1);
+      adapter.setItem('k', 'v', (err) => got.push(['set', err && err.code]));
+      expect(got).toEqual([]);
+      jest.advanceTimersByTime(KV_TIMEOUT_MS);
+      expect(got).toEqual([['get', null, null], ['set', 'IO']]);
+
+      let loaded = null;
+      storage.__silentNext(100);
+      createSettingsRepository(adapter).load((err, settings) => { loaded = settings; });
+      jest.advanceTimersByTime(KV_TIMEOUT_MS * 20);
+      expect(loaded).toEqual(createDefaultSettings());
+    } finally {
+      jest.useRealTimers();
+    }
   });
 
   test('a single storage failure is retried', async () => {

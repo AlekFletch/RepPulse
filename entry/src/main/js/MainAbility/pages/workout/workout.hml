@@ -1,6 +1,6 @@
 <!-- Preparation, active set, pause and rest (spec 2.3–2.5) share one page and switch by state:
      fewer page transitions, and the session controller lives in a single page bundle. -->
-<div class="page">
+<div class="page" onswipe="onSwipe">
     <!-- PreparationScreen -->
     <div class="view" show="{{vPrepare}}">
         <image class="hero-icon" src="{{iconHero}}"></image>
@@ -61,6 +61,20 @@
         </div>
         <div class="button-dark" onclick="finish">
             <text class="button-dark-text">{{ $t('strings.finishWorkout') }}</text>
+        </div>
+    </div>
+
+    <!-- Swipe right during a workout asks first (the workout is paused meanwhile). -->
+    <div class="view" show="{{vConfirm}}">
+        <text class="caption-wide">{{ $t('strings.exitWorkoutConfirm') }}</text>
+        <text class="line-two">{{ $t('strings.exitWorkoutHint') }}</text>
+        <div class="row">
+            <div class="half" onclick="cancelExit">
+                <text class="half-text">{{ $t('strings.no') }}</text>
+            </div>
+            <div class="half-danger" onclick="confirmExit">
+                <text class="half-danger-text">{{ $t('strings.yes') }}</text>
+            </div>
         </div>
     </div>
 </div>

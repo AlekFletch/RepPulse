@@ -1,8 +1,13 @@
 // @system.storage double: string key-value store.
 let data = {};
 let failures = 0;
+let silent = 0;
 
 function failed(options) {
+  if (silent > 0) {
+    silent--;
+    return true;
+  }
   if (failures > 0) {
     failures--;
     options.fail('storage busy', 300);
@@ -39,6 +44,11 @@ const storage = {
   __reset: function () {
     data = {};
     failures = 0;
+    silent = 0;
+  },
+  /** The next n get/set calls never call back (seen on the watch for missing keys). */
+  __silentNext: function (n) {
+    silent = n;
   },
   /** The next n get/set calls fail. */
   __failNext: function (n) {
