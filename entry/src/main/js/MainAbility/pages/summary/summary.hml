@@ -1,0 +1,31 @@
+<!-- WorkoutSummaryScreen (spec 4.1): "Сохранить", "Повторить", "На главную". -->
+<div class="page">
+    <list class="list" ref="list">
+        <list-item class="header">
+            <image class="icon" src="{{icon}}"></image>
+            <text class="title">{{ $t('strings.workoutCompleted') }}</text>
+        </list-item>
+        <list-item class="big-item">
+            <text class="big">{{totalText}}</text>
+        </list-item>
+        <list-item class="row" for="{{rows}}" tid="id">
+            <text class="row-label">{{$item.label}}</text>
+            <text class="row-value">{{$item.value}}</text>
+        </list-item>
+        <list-item class="set-row" for="{{sets}}" tid="id">
+            <text class="set-text">{{$item.text}}</text>
+        </list-item>
+        <list-item class="warn-item" if="{{hasMessage}}">
+            <text class="warn">{{message}}</text>
+        </list-item>
+        <list-item class="button" onclick="save">
+            <text class="button-text">{{saveText}}</text>
+        </list-item>
+        <list-item class="button-dark" onclick="repeat">
+            <text class="button-dark-text">{{ $t('strings.repeat') }}</text>
+        </list-item>
+        <list-item class="button-dark" onclick="goHome">
+            <text class="button-dark-text">{{ $t('strings.toHome') }}</text>
+        </list-item>
+    </list>
+</div>

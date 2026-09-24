@@ -1,0 +1,30 @@
+<!-- TimerSetupScreen (spec 2.4): duration 10 s – 60 min, vibration per rep. -->
+<div class="page" onswipe="onSwipe">
+    <list class="list" ref="list">
+        <list-item class="header">
+            <div class="back" onclick="goBack">
+                <text class="back-text">{{ $t('strings.back') }}</text>
+            </div>
+            <image class="icon" src="{{icon}}"></image>
+            <text class="title">{{ $t('strings.modeTimer') }}</text>
+        </list-item>
+        <list-item class="item-step">
+            <text class="label">{{ $t('strings.duration') }}</text>
+            <div class="stepper">
+                <text class="step" onclick="durationMinus">-</text>
+                <text class="value">{{durationText}}</text>
+                <text class="step" onclick="durationPlus">+</text>
+            </div>
+        </list-item>
+        <list-item class="item">
+            <text class="label-wide">{{ $t('strings.vibrationOnRep') }}</text>
+            <switch class="switch" checked="{{vibrationOnRep}}" onchange="onVibrationChange"></switch>
+        </list-item>
+        <list-item class="error-item" if="{{hasError}}">
+            <text class="error">{{errorText}}</text>
+        </list-item>
+        <list-item class="start" onclick="start">
+            <text class="start-text">{{ $t('strings.start') }}</text>
+        </list-item>
+    </list>
+</div>

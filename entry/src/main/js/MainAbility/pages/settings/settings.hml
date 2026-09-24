@@ -1,0 +1,41 @@
+<!-- SettingsScreen: every change is stored at once. "О приложении": brand icon, name, version. -->
+<div class="page" onswipe="onSwipe">
+    <list class="list" ref="list">
+        <list-item class="header">
+            <div class="back" onclick="goHome">
+                <text class="back-text">{{ $t('strings.back') }}</text>
+            </div>
+            <text class="title">{{ $t('strings.settings') }}</text>
+        </list-item>
+        <list-item class="item" onclick="toggleWrist">
+            <text class="label">{{ $t('strings.wristSide') }}</text>
+            <text class="value">{{wristText}}</text>
+        </list-item>
+        <list-item class="item">
+            <text class="label">{{ $t('strings.vibration') }}</text>
+            <switch class="switch" checked="{{vibrationEnabled}}" onchange="onVibrationChange"></switch>
+        </list-item>
+        <list-item class="item">
+            <text class="label">{{ $t('strings.vibrationOnRep') }}</text>
+            <switch class="switch" checked="{{vibrationOnRep}}" onchange="onRepVibrationChange"></switch>
+        </list-item>
+        <list-item class="item">
+            <text class="label">{{ $t('strings.countdown') }}</text>
+            <switch class="switch" checked="{{countdownEnabled}}" onchange="onCountdownChange"></switch>
+        </list-item>
+        <list-item class="item" onclick="cycleSensitivity">
+            <text class="label">{{ $t('strings.sensitivity') }}</text>
+            <text class="value">{{sensitivityText}}</text>
+        </list-item>
+        <list-item class="warn-item" if="{{hasMessage}}">
+            <text class="warn">{{ $t('strings.saveFailed') }}</text>
+        </list-item>
+        <list-item class="about">
+            <image class="app-icon" src="/common/icons/reppulse_app_icon_48.png"></image>
+            <div class="about-text">
+                <text class="app-name">{{ $t('strings.appName') }}</text>
+                <text class="app-version">{{ $t('strings.appVersion') }}</text>
+            </div>
+        </list-item>
+    </list>
+</div>

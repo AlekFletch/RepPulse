@@ -1,0 +1,111 @@
+.page {
+    width: 408px;
+    height: 480px;
+    flex-direction: column;
+    align-items: center;
+    background-color: #050A1F;
+}
+.list {
+    width: 360px;
+    height: 480px;
+    background-color: #050A1F;
+}
+.header {
+    width: 360px;
+    height: 88px;
+    flex-direction: row;
+    align-items: center;
+}
+.back {
+    width: 48px;
+    height: 48px;
+    margin-right: 14px;
+    justify-content: center;
+    align-items: center;
+    border-radius: 24px;
+    background-color: #0E1638;
+}
+.back-text {
+    width: 30px;
+    height: 40px;
+    font-size: 32px;
+    text-align: center;
+    color: #FFFFFF;
+}
+.title {
+    width: 290px;
+    height: 40px;
+    font-size: 28px;
+    color: #FFFFFF;
+}
+.item {
+    width: 360px;
+    height: 80px;
+    margin-bottom: 6px;
+    flex-direction: row;
+    align-items: center;
+    padding-left: 16px;
+    padding-right: 12px;
+    border-radius: 20px;
+    background-color: #0E1638;
+}
+.label {
+    width: 222px;
+    height: 64px;
+    font-size: 22px;
+    color: #FFFFFF;
+}
+.value {
+    width: 106px;
+    height: 34px;
+    font-size: 22px;
+    text-align: right;
+    color: #2DE3C4;
+}
+.switch {
+    width: 80px;
+    height: 44px;
+    margin-left: 26px;
+}
+.warn-item {
+    width: 360px;
+    height: 44px;
+    justify-content: center;
+}
+.warn {
+    width: 360px;
+    height: 36px;
+    font-size: 20px;
+    color: #FF8A7A;
+}
+.about {
+    width: 360px;
+    height: 100px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+.app-icon {
+    width: 48px;
+    height: 48px;
+    margin-right: 14px;
+}
+.about-text {
+    width: 200px;
+    height: 70px;
+    flex-direction: column;
+}
+.app-name {
+    width: 200px;
+    height: 36px;
+    font-size: 26px;
+    color: #FFFFFF;
+}
+.app-version {
+    width: 200px;
+    height: 30px;
+    font-size: 20px;
+    color: #8A93B8;
+}

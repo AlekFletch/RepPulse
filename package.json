@@ -10,7 +10,8 @@
     "check:icons": "node tools/check-icons.js",
     "check:release": "node tools/check-release.js",
     "verify": "npm run lint && npm test && npm run check:icons",
-    "gen:fixtures": "node --no-warnings tools/gen-fixtures.mjs"
+    "gen:fixtures": "node --no-warnings tools/gen-fixtures.mjs",
+    "check:bundles": "node tools/check-bundles.js"
   },
   "license": "UNLICENSED",
   "devDependencies": {

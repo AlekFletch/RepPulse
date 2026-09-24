@@ -1,28 +1,30 @@
-<!-- Stage 2 placeholder home. Full navigation and screens arrive in Stage 3. -->
-<list class="list">
-    <list-item class="header">
-        <image class="app-icon" src="/common/icons/reppulse_app_icon_48.png"></image>
-        <text class="title">{{ $t('strings.homeTitle') }}</text>
-    </list-item>
-    <list-item class="tile">
-        <image class="tile-icon" src="/common/icons/squat_icon_64.png"></image>
-        <text class="tile-label">{{ $t('strings.squats') }}</text>
-    </list-item>
-    <list-item class="tile">
-        <image class="tile-icon" src="/common/icons/pushup_icon_64.png"></image>
-        <text class="tile-label">{{ $t('strings.pushUps') }}</text>
-    </list-item>
-    <list-item class="tile">
-        <!-- History Icon master not delivered yet: neutral placeholder per spec. -->
-        <div class="icon-placeholder">
-            <text class="placeholder-text">—</text>
-        </div>
-        <text class="tile-label">{{ $t('strings.history') }}</text>
-    </list-item>
-    <list-item class="note-item">
-        <text class="note">{{ $t('strings.stage2Placeholder') }}</text>
-    </list-item>
-    <list-item class="button-item">
-        <input type="button" class="button" value="{{ $t('strings.diagnostics') }}" onclick="openDiagnostics"></input>
-    </list-item>
-</list>
+<!-- HomeScreen (spec 2.1): brand icon + "Тренировка", three equal tiles, settings. -->
+<div class="page">
+    <list class="list" ref="list">
+        <list-item class="header">
+            <image class="app-icon" src="/common/icons/reppulse_app_icon_48.png"></image>
+            <text class="title">{{ $t('strings.homeTitle') }}</text>
+        </list-item>
+        <list-item class="tile" onclick="openSquats">
+            <image class="tile-icon" src="/common/icons/squat_icon_64.png"></image>
+            <text class="tile-label">{{ $t('strings.squats') }}</text>
+        </list-item>
+        <list-item class="tile" onclick="openPushUps">
+            <image class="tile-icon" src="/common/icons/pushup_icon_64.png"></image>
+            <text class="tile-label">{{ $t('strings.pushUps') }}</text>
+        </list-item>
+        <list-item class="tile" onclick="openHistory">
+            <!-- History Icon master not delivered yet: neutral placeholder per spec. -->
+            <div class="icon-placeholder">
+                <text class="placeholder-text">—</text>
+            </div>
+            <text class="tile-label">{{ $t('strings.history') }}</text>
+        </list-item>
+        <list-item class="small-tile" onclick="openSettings">
+            <text class="small-label">{{ $t('strings.settings') }}</text>
+        </list-item>
+        <list-item class="small-tile" if="{{debug}}" onclick="openDiagnostics">
+            <text class="small-label">{{ $t('strings.diagnostics') }}</text>
+        </list-item>
+    </list>
+</div>

@@ -1,0 +1,58 @@
+<!-- SetsSetupScreen (spec 2.5). Reps goal and work time switch off one step below the minimum. -->
+<div class="page" onswipe="onSwipe">
+    <list class="list" ref="list">
+        <list-item class="header">
+            <div class="back" onclick="goBack">
+                <text class="back-text">{{ $t('strings.back') }}</text>
+            </div>
+            <image class="icon" src="{{icon}}"></image>
+            <text class="title">{{ $t('strings.modeSets') }}</text>
+        </list-item>
+        <list-item class="item-step">
+            <text class="label">{{ $t('strings.setCount') }}</text>
+            <div class="stepper">
+                <text class="step" onclick="setsMinus">-</text>
+                <text class="value">{{setsText}}</text>
+                <text class="step" onclick="setsPlus">+</text>
+            </div>
+        </list-item>
+        <list-item class="item-step">
+            <text class="label">{{ $t('strings.targetReps') }}</text>
+            <div class="stepper">
+                <text class="step" onclick="repsMinus">-</text>
+                <text class="value">{{repsText}}</text>
+                <text class="step" onclick="repsPlus">+</text>
+            </div>
+        </list-item>
+        <list-item class="item-step">
+            <text class="label">{{ $t('strings.workTime') }}</text>
+            <div class="stepper">
+                <text class="step" onclick="workMinus">-</text>
+                <text class="value">{{workText}}</text>
+                <text class="step" onclick="workPlus">+</text>
+            </div>
+        </list-item>
+        <list-item class="item-step">
+            <text class="label">{{ $t('strings.restTime') }}</text>
+            <div class="stepper">
+                <text class="step" onclick="restMinus">-</text>
+                <text class="value">{{restText}}</text>
+                <text class="step" onclick="restPlus">+</text>
+            </div>
+        </list-item>
+        <list-item class="item">
+            <text class="label-wide">{{ $t('strings.autoStartNext') }}</text>
+            <switch class="switch" checked="{{autoStart}}" onchange="onAutoStartChange"></switch>
+        </list-item>
+        <list-item class="item">
+            <text class="label-wide">{{ $t('strings.vibrationOnRep') }}</text>
+            <switch class="switch" checked="{{vibrationOnRep}}" onchange="onVibrationChange"></switch>
+        </list-item>
+        <list-item class="error-item" if="{{hasError}}">
+            <text class="error">{{errorText}}</text>
+        </list-item>
+        <list-item class="start" onclick="start">
+            <text class="start-text">{{ $t('strings.start') }}</text>
+        </list-item>
+    </list>
+</div>

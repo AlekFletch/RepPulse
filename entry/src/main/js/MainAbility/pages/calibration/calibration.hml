@@ -1,0 +1,30 @@
+<!-- CalibrationScreen (spec 2.6). Stage 3: wrist choice and instructions; the recording and
+     CalibrationEngine arrive in Stage 4 together with rep detection. -->
+<div class="page" onswipe="onSwipe">
+    <list class="list" ref="list">
+        <list-item class="header">
+            <div class="back" onclick="goBack">
+                <text class="back-text">{{ $t('strings.back') }}</text>
+            </div>
+            <image class="icon" src="{{icon}}"></image>
+            <text class="title">{{ $t('strings.calibration') }}</text>
+        </list-item>
+        <list-item class="caption-item">
+            <text class="caption">{{ $t('strings.chooseWrist') }}</text>
+        </list-item>
+        <list-item class="row-item">
+            <div class="choice" style="background-color: {{leftColor}};" onclick="chooseLeft">
+                <text class="choice-text" style="color: {{leftText}};">{{ $t('strings.wristLeft') }}</text>
+            </div>
+            <div class="choice" style="background-color: {{rightColor}};" onclick="chooseRight">
+                <text class="choice-text" style="color: {{rightText}};">{{ $t('strings.wristRight') }}</text>
+            </div>
+        </list-item>
+        <list-item class="text-item">
+            <text class="text">{{ $t('strings.calibrationInstruction') }}</text>
+        </list-item>
+        <list-item class="note-item">
+            <text class="note">{{ $t('strings.calibrationSoon') }}</text>
+        </list-item>
+    </list>
+</div>

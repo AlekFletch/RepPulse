@@ -1,0 +1,33 @@
+<!-- Exercise / mode selection (spec 2.2). Swipe right or "‹" returns home. -->
+<div class="page" onswipe="onSwipe">
+    <list class="list" ref="list">
+        <list-item class="header">
+            <div class="back" onclick="goHome">
+                <text class="back-text">{{ $t('strings.back') }}</text>
+            </div>
+            <image class="icon" src="{{icon}}"></image>
+            <text class="title">{{title}}</text>
+        </list-item>
+        <list-item class="hint-item">
+            <text class="hint">{{ $t('strings.wearTightHint') }}</text>
+        </list-item>
+        <list-item class="hint-item" if="{{pushUps}}">
+            <text class="hint">{{ $t('strings.pushUpAccuracyHint') }}</text>
+        </list-item>
+        <list-item class="warn-item" if="{{lowBattery}}">
+            <text class="warn">{{ $t('strings.lowBattery') }}</text>
+        </list-item>
+        <list-item class="button" onclick="startFree">
+            <text class="button-text">{{ $t('strings.modeFree') }}</text>
+        </list-item>
+        <list-item class="button" onclick="openTimer">
+            <text class="button-text">{{ $t('strings.modeTimer') }}</text>
+        </list-item>
+        <list-item class="button" onclick="openSets">
+            <text class="button-text">{{ $t('strings.modeSets') }}</text>
+        </list-item>
+        <list-item class="button secondary" onclick="openCalibration">
+            <text class="button-text secondary-text">{{ $t('strings.calibration') }}</text>
+        </list-item>
+    </list>
+</div>

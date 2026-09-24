@@ -1,0 +1,39 @@
+<!-- WorkoutHistoryScreen (spec 4.3). History Icon in the header only, exercise icons in rows. -->
+<div class="page" onswipe="onSwipe">
+    <list class="list" ref="list">
+        <list-item class="header">
+            <div class="back" onclick="goHome">
+                <text class="back-text">{{ $t('strings.back') }}</text>
+            </div>
+            <!-- History Icon master not delivered yet: neutral placeholder per spec. -->
+            <div class="icon-placeholder">
+                <text class="placeholder-text">—</text>
+            </div>
+            <text class="title">{{ $t('strings.history') }}</text>
+        </list-item>
+        <list-item class="empty-item" if="{{empty}}">
+            <text class="empty">{{emptyText}}</text>
+        </list-item>
+        <list-item class="entry" for="{{entries}}" tid="id" onclick="open($idx)">
+            <image class="entry-icon" src="{{$item.icon}}"></image>
+            <div class="entry-text">
+                <text class="entry-line1">{{$item.line1}}</text>
+                <text class="entry-line2">{{$item.line2}}</text>
+            </div>
+        </list-item>
+        <list-item class="button-dark" if="{{canDelete}}" onclick="askDeleteAll">
+            <text class="button-dark-text">{{ $t('strings.deleteAll') }}</text>
+        </list-item>
+        <list-item class="confirm" if="{{confirming}}">
+            <text class="confirm-text">{{ $t('strings.deleteAllConfirm') }}</text>
+            <div class="confirm-row">
+                <div class="half" onclick="cancelDelete">
+                    <text class="half-text">{{ $t('strings.no') }}</text>
+                </div>
+                <div class="half-danger" onclick="deleteAll">
+                    <text class="half-danger-text">{{ $t('strings.yes') }}</text>
+                </div>
+            </div>
+        </list-item>
+    </list>
+</div>

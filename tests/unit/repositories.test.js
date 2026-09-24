@@ -1,10 +1,12 @@
 import storage from '@system.storage';
+import file from '@system.file';
 import { createInMemoryStorageAdapter } from '../../entry/src/main/js/MainAbility/common/storage/InMemoryStorageAdapter.js';
 import { createSystemStorageAdapter } from '../../entry/src/main/js/MainAbility/common/storage/LocalStorageAdapter.js';
 import { createWorkoutRepository, MAX_HISTORY } from '../../entry/src/main/js/MainAbility/common/storage/WorkoutRepository.js';
 import { createSettingsRepository } from '../../entry/src/main/js/MainAbility/common/storage/SettingsRepository.js';
 import { createCalibrationRepository } from '../../entry/src/main/js/MainAbility/common/storage/CalibrationRepository.js';
 import { createCalibrationProfile, createDefaultSettings } from '../../entry/src/main/js/MainAbility/common/domain/models.js';
+import { saveLastSession } from '../../entry/src/main/js/MainAbility/common/storage/LastSessionStore.js';
 import { series } from '../../entry/src/main/js/MainAbility/common/util/series.js';
 
 const call = (fn, ...args) => new Promise((resolve) => fn(...args, (err, value) => resolve({ err, value })));
@@ -22,7 +24,10 @@ function session(id, startedAt, reps) {
   };
 }
 
-beforeEach(() => storage.__reset());
+beforeEach(() => {
+  storage.__reset();
+  file.__reset();
+});
 
 describe('WorkoutRepository', () => {
   test('save, list (newest first), get, remove, clear', async () => {
@@ -59,11 +64,11 @@ describe('WorkoutRepository', () => {
     expect((await call(storageAdapter.listFiles, 'workouts')).value.length).toBe(MAX_HISTORY + 1);
   });
 
-  test('last finished session round-trips', async () => {
-    const repo = createWorkoutRepository(createInMemoryStorageAdapter());
+  test('last finished session: written by LastSessionStore, read by the repository', async () => {
+    const repo = createWorkoutRepository(createSystemStorageAdapter());
     expect((await call(repo.getLast)).err).not.toBeNull();
-    await call(repo.saveLast, session('z', 1, 3));
-    expect((await call(repo.getLast)).value.id).toBe('z');
+    expect((await call(saveLastSession, session('z', 1, 3))).err).toBeNull();
+    expect((await call(repo.getLast)).value).toMatchObject({ id: 'z', note: 'Приседания' });
   });
 });
 

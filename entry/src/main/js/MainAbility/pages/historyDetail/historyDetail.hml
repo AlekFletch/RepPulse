@@ -1,0 +1,36 @@
+<!-- WorkoutDetailScreen (spec 4.3): totals, per-set breakdown, rest, manual corrections, delete. -->
+<div class="page" onswipe="onSwipe">
+    <list class="list" ref="list">
+        <list-item class="header">
+            <div class="back" onclick="goBack">
+                <text class="back-text">{{ $t('strings.back') }}</text>
+            </div>
+            <image class="icon" src="{{icon}}"></image>
+            <text class="title">{{title}}</text>
+        </list-item>
+        <list-item class="row" for="{{rows}}" tid="id">
+            <text class="row-label">{{$item.label}}</text>
+            <text class="row-value">{{$item.value}}</text>
+        </list-item>
+        <list-item class="set-row" for="{{sets}}" tid="id">
+            <text class="set-text">{{$item.text}}</text>
+        </list-item>
+        <list-item class="warn-item" if="{{hasMessage}}">
+            <text class="warn">{{message}}</text>
+        </list-item>
+        <list-item class="button-dark" if="{{canDelete}}" onclick="askDelete">
+            <text class="button-dark-text">{{ $t('strings.delete') }}</text>
+        </list-item>
+        <list-item class="confirm" if="{{confirming}}">
+            <text class="confirm-text">{{ $t('strings.deleteConfirm') }}</text>
+            <div class="confirm-row">
+                <div class="half" onclick="cancelDelete">
+                    <text class="half-text">{{ $t('strings.no') }}</text>
+                </div>
+                <div class="half-danger" onclick="confirmDelete">
+                    <text class="half-danger-text">{{ $t('strings.yes') }}</text>
+                </div>
+            </div>
+        </list-item>
+    </list>
+</div>

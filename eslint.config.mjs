@@ -22,7 +22,13 @@ const LITE_RESTRICTED_SYNTAX = [
   // any regex fails the install with error 34 (TRANSFORM_BC_FILE_ERROR).
   { selector: 'Literal[regex]', message: 'No RegExp on the watch (install error 34); use indexOf/charCodeAt loops.' },
   { selector: 'NewExpression[callee.name="RegExp"]', message: 'No RegExp on the watch (install error 34).' },
-  { selector: 'CallExpression[callee.name="RegExp"]', message: 'No RegExp on the watch (install error 34).' }
+  { selector: 'CallExpression[callee.name="RegExp"]', message: 'No RegExp on the watch (install error 34).' },
+  // The page loader assigns the compiled template to `render` and the CSS to `styleSheet`,
+  // silently replacing page methods with those names ("TypeError: Expected a function").
+  {
+    selector: 'ExportDefaultDeclaration > ObjectExpression > Property[key.name=/^(render|styleSheet)$/]',
+    message: '`render` / `styleSheet` are reserved on lite pages; pick another method name.'
+  }
 ];
 
 const ES2015_BUILTINS = [

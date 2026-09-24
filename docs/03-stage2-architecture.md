@@ -152,7 +152,7 @@ PREPARING → PAUSED (приложение скрыто во время отсч
 
 ```
 npm install            # один раз
-npm test               # Jest: 95 тестов
+npm test               # Jest (133 теста после Этапа 3)
 npm run lint           # ESLint с правилами lite JS
 npm run check:icons
 npm run check:release  # падает, пока DEBUG=true и есть diagnostics — это ожидаемо в разработке

@@ -1,6 +1,6 @@
 # RepPulse — статус и передача контекста
 
-Обновлено: 2026-09-24. Документ для продолжения работы в новом диалоге. Здесь собраны главные факты, решения и открытые вопросы. Подробности — в [01](01-platform-verification.md) … [04](04-deveco-device-setup.md).
+Обновлено: 2026-09-24. Документ для продолжения работы в новом диалоге. Здесь собраны главные факты, решения и открытые вопросы. Подробности — в [01](01-platform-verification.md) … [04](04-deveco-device-setup.md), Этап 3 — в [06](06-stage3.md).
 
 ---
 
@@ -11,7 +11,7 @@
 | 1. Проверка платформы | ✅ [docs/01](01-platform-verification.md) |
 | 2. Каркас, модели, адаптеры, MockSensorProvider, тесты | ✅ [docs/03](03-stage2-architecture.md); 98 тестов, ESLint для lite JS |
 | Первая установка на часы (smoke) | ✅ 2026-09-24 `reppulse-fix2_all-perms.hap` установлен (со всеми разрешениями); ошибки 40 и 34 разобраны в §4. Далее — «Диагностика» (§5) |
-| 3. UI-навигация, экраны, хранилище, контроллер тренировки | ⏳ не начат |
+| 3. UI-навигация, экраны, хранилище, контроллер тренировки | ✅ [docs/06](06-stage3.md): проверено в симуляторе, ждём проверки на часах |
 | 4. Детекция повторов, калибровка | ⏳ |
 | 5. История, статистика, настройки, тесты, QA | ⏳ |
 | 6. README, AppGallery, политика конфиденциальности | ⏳ |
@@ -57,9 +57,11 @@
 - **Сборка из консоли** (DevEco при этом можно не открывать):
   ```bash
   export DEVECO_SDK_HOME="C:/Program Files/Huawei/DevEco Studio/sdk"
-  "/c/Program Files/Huawei/DevEco Studio/tools/node/node.exe" "/c/Program Files/Huawei/DevEco Studio/tools/hvigor/bin/hvigorw.js" --mode module -p module=entry@default -p product=default assembleHap --no-daemon
+  "/c/Program Files/Huawei/DevEco Studio/tools/node/node.exe" "/c/Program Files/Huawei/DevEco Studio/tools/hvigor/bin/hvigorw.js" --mode module -p module=entry@default -p product=default -p buildMode=release assembleHap --no-daemon
+  npm run check:bundles
   ```
-  Результат: `entry/build/default/outputs/default/entry-default-signed.hap`. После переименований удаляйте `entry/build` перед сборкой, иначе в пакет попадут старые файлы.
+  Результат: `entry/build/default/outputs/default/entry-default-signed.hap`. Перед сборкой удаляйте `entry/build`, иначе в пакет могут попасть старые файлы.
+- **Для часов собираем только release (`-p buildMode=release`).** SDK минифицирует JS только в release, а страница больше 48 КБ на часах не откроется (см. [06 §3](06-stage3.md)). Release-пакет подписывается тем же debug-профилем. `BuildConfig.DEBUG` от режима сборки не зависит: «Диагностика» и имитация повтора касанием остаются, пока `DEBUG = true`.
 
 ---
 
@@ -120,7 +122,9 @@ DevEco Assistant писал: *Installation failed: 40. Invalid configuration fil
 - файлы больше 4 КБ читаются;
 - `storage` ограничен 128 символами.
 
-Осталось на часах: ощущения от вибрации, `setKeepScreenOn`, поведение при кнопке и уведомлении. Плитки главного экрана пока заглушки, это Этап 3.
+Вибрация проверена: `short` ощущается коротко, `long` — длинно. Осталось на часах: `setKeepScreenOn`, поведение при кнопке и уведомлении (вошло в чек-лист Этапа 3, [06 §5](06-stage3.md)).
+
+**Этап 3 готов** ([docs/06](06-stage3.md)). Следующий шаг — Этап 4: детекция повторов и калибровка. Бюджет страницы тренировки: ≤ 48 КБ JS в release и ~100 КБ кучи на всё. Сейчас страница весит 31 КБ, датчики на ней пока не подключены.
 
 Исходный план:
 

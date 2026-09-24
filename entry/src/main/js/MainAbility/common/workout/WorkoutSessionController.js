@@ -1,6 +1,6 @@
 import { WorkoutMode, WorkoutStatus, SetEndReason } from '../domain/enums.js';
 import { Timing } from '../domain/limits.js';
-import { createWorkoutSession, createSetResult, plannedSetCount } from '../domain/models.js';
+import { createWorkoutSession, createSetResult, plannedSetCount } from '../domain/workout.js';
 import { createWorkoutStateMachine } from '../domain/workoutStateMachine.js';
 import { cadence, computeSessionTotals, setRepTotal } from '../domain/stats.js';
 import { SensorErrorCode } from '../sensors/SensorError.js';

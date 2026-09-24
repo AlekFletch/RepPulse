@@ -64,6 +64,15 @@
       {
         "pages": [
           "pages/index/index",
+          "pages/exercise/exercise",
+          "pages/timerSetup/timerSetup",
+          "pages/setsSetup/setsSetup",
+          "pages/workout/workout",
+          "pages/summary/summary",
+          "pages/history/history",
+          "pages/historyDetail/historyDetail",
+          "pages/settings/settings",
+          "pages/calibration/calibration",
           "pages/diagnostics/diagnostics"
         ],
         "name": ".MainAbility"

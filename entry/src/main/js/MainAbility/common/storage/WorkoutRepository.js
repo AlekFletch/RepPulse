@@ -32,7 +32,8 @@ export function summarize(session) {
  * Workout history over LocalStorageAdapter files:
  *   workouts/index.json    summaries, newest first
  *   workouts/w_<id>.json   one full WorkoutSession per file (a record fits well under 4 KB reads)
- *   workouts/last.json     the session just finished, shown by the summary page before "Сохранить"
+ *   workouts/last.json     the session just finished (written by LastSessionStore), shown by the
+ *                          summary page before "Сохранить"
  * All callbacks are cb(err, result).
  */
 export function createWorkoutRepository(storage) {
@@ -145,16 +146,6 @@ export function createWorkoutRepository(storage) {
         series(steps, function () {
           writeIndex([], cb);
         });
-      });
-    },
-
-    saveLast: function (session, cb) {
-      storage.ensureDir(DIR, function (err) {
-        if (err) {
-          cb(err);
-          return;
-        }
-        storage.writeText(LAST, toAsciiJson(session), cb);
       });
     },
 
