@@ -32,21 +32,10 @@
     text-align: center;
     color: #FFFFFF;
 }
-.icon-placeholder {
-    width: 40px;
-    height: 40px;
+.header-icon {
+    width: 28px;
+    height: 28px;
     margin-right: 10px;
-    border-radius: 12px;
-    background-color: #1B2550;
-    justify-content: center;
-    align-items: center;
-}
-.placeholder-text {
-    width: 40px;
-    height: 30px;
-    font-size: 22px;
-    text-align: center;
-    color: #8A93B8;
 }
 .title {
     width: 240px;

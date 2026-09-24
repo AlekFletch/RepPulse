@@ -15,15 +15,16 @@ describe('icons', () => {
     expect(result.checkedIcons.length).toBeGreaterThanOrEqual(5);
   });
 
-  test('icon constants; History Icon falls back to the placeholder and is logged', () => {
+  test('icon constants; a missing size falls back to the placeholder and is logged', () => {
     expect(ICON_SQUAT[64]).toBe('/common/icons/squat_icon_64.png');
     expect(ICON_PUSH_UP[28]).toBe('/common/icons/pushup_icon_28.png');
+    expect(ICON_HISTORY[64]).toBe('/common/icons/history_icon_64.png');
     expect(ICON_APP[48]).toBe('/common/icons/reppulse_app_icon_48.png');
     const logger = { missingAsset: jest.fn() };
-    expect(iconPath(ICON_HISTORY, 64, logger)).toBeNull();
-    expect(logger.missingAsset).toHaveBeenCalled();
-    expect(iconPath(ICON_SQUAT, 64, logger)).toBe('/common/icons/squat_icon_64.png');
+    expect(iconPath(ICON_HISTORY, 28, logger)).toBe('/common/icons/history_icon_28.png');
     expect(iconPath(ICON_SQUAT, 96, logger)).toBeNull();
+    expect(logger.missingAsset).toHaveBeenCalledTimes(1);
+    expect(iconPath(null, 64, logger)).toBeNull();
   });
 
   test('launcher icon is the RepPulse brand icon, not an exercise icon', () => {

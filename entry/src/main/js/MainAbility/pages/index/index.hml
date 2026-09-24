@@ -14,10 +14,7 @@
             <text class="tile-label">{{ $t('strings.pushUps') }}</text>
         </list-item>
         <list-item class="tile" onclick="openHistory">
-            <!-- History Icon master not delivered yet: neutral placeholder per spec. -->
-            <div class="icon-placeholder">
-                <text class="placeholder-text">—</text>
-            </div>
+            <image class="tile-icon" src="/common/icons/history_icon_64.png"></image>
             <text class="tile-label">{{ $t('strings.history') }}</text>
         </list-item>
         <list-item class="small-tile" onclick="openSettings">

@@ -7,7 +7,7 @@ Usage:  python tools/export_icons.py
 Requires: Pillow
 """
 import os
-from PIL import Image
+from PIL import Image, ImageChops, ImageDraw
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(ROOT, "assets-src", "icons")
@@ -31,6 +31,11 @@ IN_APP_SIZES = {
 
 QA_SIZES = [1024, 512, 192, 96, 48]
 
+# Masters drawn as a disc on a black square: the corners become transparent (a technical
+# transparency step the spec allows); every pixel inside the disc is kept as is.
+ROUND_MASTERS = {"reppulse_app_icon"}
+DISC_THRESHOLD = 40  # R+G+B above this is the disc, below is the black corner field
+
 
 def load(name):
     for ext in (".png", ".webp", ".svg"):
@@ -38,6 +43,31 @@ def load(name):
         if os.path.exists(path):
             return Image.open(path).convert("RGBA")
     raise FileNotFoundError("missing master asset: " + name)
+
+
+def find_disc(img):
+    """Centre and radius of the disc, measured along the middle row and column."""
+    w, h = img.size
+    row = [sum(img.getpixel((x, h // 2))[:3]) for x in range(w)]
+    col = [sum(img.getpixel((w // 2, y))[:3]) for y in range(h)]
+    left = next(x for x in range(w) if row[x] > DISC_THRESHOLD)
+    right = next(x for x in range(w - 1, -1, -1) if row[x] > DISC_THRESHOLD)
+    top = next(y for y in range(h) if col[y] > DISC_THRESHOLD)
+    bottom = next(y for y in range(h - 1, -1, -1) if col[y] > DISC_THRESHOLD)
+    radius = max(right - left, bottom - top) / 2.0 + 2
+    return (left + right) / 2.0, (top + bottom) / 2.0, radius
+
+
+def round_alpha(img):
+    """Transparent outside the disc; drawn 4x larger and scaled down for a smooth edge."""
+    cx, cy, r = find_disc(img)
+    k = 4
+    mask = Image.new("L", (img.width * k, img.height * k), 0)
+    ImageDraw.Draw(mask).ellipse(((cx - r) * k, (cy - r) * k, (cx + r) * k, (cy + r) * k), fill=255)
+    mask = mask.resize(img.size, Image.LANCZOS)
+    out = img.copy()
+    out.putalpha(ImageChops.multiply(img.getchannel("A"), mask))
+    return out
 
 
 def save(img, size, path):
@@ -48,6 +78,8 @@ def save(img, size, path):
 
 def main():
     app = load("reppulse_app_icon")
+    if "reppulse_app_icon" in ROUND_MASTERS:
+        app = round_alpha(app)
     save(app, LAUNCHER_SIZE, os.path.join(MEDIA, "icon.png"))
     save(app, LAUNCHER_SMALL_SIZE, os.path.join(MEDIA, "icon_small.png"))
     for size in QA_SIZES:
@@ -55,6 +87,8 @@ def main():
 
     for name, sizes in IN_APP_SIZES.items():
         img = load(name)
+        if name in ROUND_MASTERS:
+            img = round_alpha(img)
         for size in sizes:
             save(img, size, os.path.join(IN_APP, "%s_%d.png" % (name, size)))
 

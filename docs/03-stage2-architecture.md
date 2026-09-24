@@ -129,7 +129,7 @@ PREPARING → PAUSED (приложение скрыто во время отсч
 ## 7. Иконки
 
 - `tools/export_icons.py` делает только resize и экспорт PNG из оригиналов в `assets-src/icons`. Цвета и форма не меняются.
-- `ICON_HISTORY = null`: пока нет оригинала, UI показывает нейтральный placeholder «—», а в debug-лог пишется `missingAsset`.
+- `ICON_HISTORY` — с 2026-09-24 (28 и 64 px). Если иконки нужного размера нет, UI показывает нейтральный placeholder «—», а в debug-лог пишется `missingAsset`.
 - Как добавить History Icon, когда он появится:
   1. положить `assets-src/icons/history_icon.png`;
   2. выполнить `python tools/export_icons.py`;

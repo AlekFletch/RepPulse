@@ -2,9 +2,8 @@
  * In-app icon assets (designer masters in assets-src/icons, exported by tools/export_icons.py).
  * Lite <image> draws bitmaps at native size, so each on-screen size has its own file.
  *
- * ICON_HISTORY: the History Icon master has not been delivered yet. Until then `null`
- * means "render the neutral RepPulse placeholder (dark rounded square with '—')".
- * Never substitute emoji or third-party icons.
+ * A missing asset (`null` / no file for a size) means "render the neutral RepPulse placeholder
+ * (dark rounded square with '—')". Never substitute emoji or third-party icons.
  */
 const ROOT = '/common/icons/';
 
@@ -24,7 +23,10 @@ export const ICON_PUSH_UP = Object.freeze({
   64: ROOT + 'pushup_icon_64.png'
 });
 
-export const ICON_HISTORY = null;
+export const ICON_HISTORY = Object.freeze({
+  28: ROOT + 'history_icon_28.png',
+  64: ROOT + 'history_icon_64.png'
+});
 
 export const ICON_APP = Object.freeze({
   48: ROOT + 'reppulse_app_icon_48.png'
