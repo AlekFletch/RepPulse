@@ -27,7 +27,7 @@ RepPulse/
           platform/                        # TimeAdapter, Logger, HapticsAdapter, ScreenAdapter,
                                            # BatteryAdapter, PermissionManager, DeviceCapabilityChecker
           storage/                         # LocalStorageAdapter (@system), InMemoryStorageAdapter, paths
-          icons/                           # PNG нужных размеров + icons.js (ICON_SQUAT, ICON_PUSH_UP, ICON_HISTORY=null)
+          icons/                           # PNG нужных размеров + icons.js (ICON_SQUAT, ICON_PUSH_UP, ICON_HISTORY)
   tests/unit, tests/mocks (@system.* двойники, FakeTimeAdapter), tests/fixtures (JSON-логи)
   tools/ export_icons.py, check-icons.js, check-release.js, gen-fixtures.mjs
   assets-src/icons (оригиналы дизайнера), assets-src/export (1024/512/192/96/48 для QA и AppGallery)
@@ -130,10 +130,7 @@ PREPARING → PAUSED (приложение скрыто во время отсч
 
 - `tools/export_icons.py` делает только resize и экспорт PNG из оригиналов в `assets-src/icons`. Цвета и форма не меняются.
 - `ICON_HISTORY` — с 2026-09-24 (28 и 64 px). Если иконки нужного размера нет, UI показывает нейтральный placeholder «—», а в debug-лог пишется `missingAsset`.
-- Как добавить History Icon, когда он появится:
-  1. положить `assets-src/icons/history_icon.png`;
-  2. выполнить `python tools/export_icons.py`;
-  3. заполнить `ICON_HISTORY` в `icons.js`.
+- Как заменить или добавить иконку: положить оригинал в `assets-src/icons/`, выполнить `python tools/export_icons.py`, прописать размеры в `icons.js`.
 - `npm run check:icons` (запускается и в Jest) проверяет:
   - что манифест ссылается на `$media:icon`, есть `icon.png` и `icon_small.png`;
   - что launcher-иконка — PNG 104×104 размером до 64 КБ;

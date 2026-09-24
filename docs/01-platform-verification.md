@@ -161,7 +161,7 @@ SQL/RDB на lite wearable недоступны: в SysCaps их нет.
 - Размер launcher-иконки: в официальном шаблоне DevEco 6.1 — **104×104** (`icon.png`), по сообщениям сообщества — 114×114. Используем 104×104. Слишком большие файлы дают error 40.
 - AppGallery listing icon: отдельный экспорт из master-файла. Точные требования AGC для часов — **TODO** перед публикацией.
 - Получены ассеты: `assets-src/icons/squat_icon.webp`, `pushup_icon.webp`, `reppulse_app_icon.webp` (главный знак: кольцо + pulse-wave + стрелка).
-- **History Icon не передан.** До его получения используем нейтральный placeholder «—» по правилу fallback из ТЗ.
+- **History Icon получен 2026-09-24** вместе с новой круглой иконкой приложения. Нейтральный placeholder «—» остался только как fallback из ТЗ на случай отсутствующего файла.
 
 ---
 
