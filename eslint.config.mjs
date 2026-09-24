@@ -17,7 +17,12 @@ const LITE_RESTRICTED_SYNTAX = [
   { selector: 'ForOfStatement', message: 'for...of needs iterators; use an indexed loop.' },
   { selector: 'FunctionDeclaration[generator=true]', message: 'Generators are not supported on lite JS.' },
   { selector: 'FunctionExpression[generator=true]', message: 'Generators are not supported on lite JS.' },
-  { selector: 'NewExpression[callee.name=/^(Map|Set|WeakMap|WeakSet|Promise|Proxy|Symbol)$/]', message: 'ES2015+ built-in: not guaranteed on lite JS.' }
+  { selector: 'NewExpression[callee.name=/^(Map|Set|WeakMap|WeakSet|Promise|Proxy|Symbol)$/]', message: 'ES2015+ built-in: not guaranteed on lite JS.' },
+  // The watch compiles JS to JerryScript bytecode at install time without RegExp support:
+  // any regex fails the install with error 34 (TRANSFORM_BC_FILE_ERROR).
+  { selector: 'Literal[regex]', message: 'No RegExp on the watch (install error 34); use indexOf/charCodeAt loops.' },
+  { selector: 'NewExpression[callee.name="RegExp"]', message: 'No RegExp on the watch (install error 34).' },
+  { selector: 'CallExpression[callee.name="RegExp"]', message: 'No RegExp on the watch (install error 34).' }
 ];
 
 const ES2015_BUILTINS = [

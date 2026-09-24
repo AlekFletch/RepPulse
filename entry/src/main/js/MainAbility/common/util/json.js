@@ -4,9 +4,13 @@
  * payloads make chunked reads safe regardless of the text content.
  */
 export function toAsciiJson(value) {
-  return JSON.stringify(value).replace(/[\u007f-￿]/g, function (ch) {
-    return '\\u' + ('0000' + ch.charCodeAt(0).toString(16)).slice(-4);
-  });
+  const json = JSON.stringify(value);
+  let out = '';
+  for (let i = 0; i < json.length; i++) {
+    const code = json.charCodeAt(i);
+    out += code < 0x7f ? json.charAt(i) : '\\u' + ('0000' + code.toString(16)).slice(-4);
+  }
+  return out;
 }
 
 /** JSON.parse that returns `fallback` instead of throwing. */
