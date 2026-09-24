@@ -8,25 +8,26 @@
  */
 const ROOT = '/common/icons/';
 
-export const IconSize = Object.freeze({ LIST: 28, HOME: 64, HERO: 96 });
+/**
+ * Every bitmap ships twice in the HAP (PNG + converted .bin, ~3x the pixels), and the whole
+ * package goes to the watch over Bluetooth, so only the sizes the screens use are exported.
+ */
+export const IconSize = Object.freeze({ LIST: 28, HOME: 64 });
 
 export const ICON_SQUAT = Object.freeze({
   28: ROOT + 'squat_icon_28.png',
-  64: ROOT + 'squat_icon_64.png',
-  96: ROOT + 'squat_icon_96.png'
+  64: ROOT + 'squat_icon_64.png'
 });
 
 export const ICON_PUSH_UP = Object.freeze({
   28: ROOT + 'pushup_icon_28.png',
-  64: ROOT + 'pushup_icon_64.png',
-  96: ROOT + 'pushup_icon_96.png'
+  64: ROOT + 'pushup_icon_64.png'
 });
 
 export const ICON_HISTORY = null;
 
 export const ICON_APP = Object.freeze({
-  48: ROOT + 'reppulse_app_icon_48.png',
-  104: ROOT + 'reppulse_app_icon_104.png'
+  48: ROOT + 'reppulse_app_icon_48.png'
 });
 
 /** Returns the asset path, or null when the asset is missing (caller shows the placeholder). */

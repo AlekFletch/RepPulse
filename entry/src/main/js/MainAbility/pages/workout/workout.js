@@ -85,7 +85,7 @@ export default {
             manual: this.$t('strings.manualCounting'),
             soon: this.$t('strings.autoCountSoon')
         };
-        this.iconHero = exerciseIcon(planInput.exerciseType, 96);
+        this.iconHero = exerciseIcon(planInput.exerciseType, 64);
         this.iconSmall = exerciseIcon(planInput.exerciseType, 28);
         this.topText = this.$t('strings.' + exerciseKey(planInput.exerciseType));
         screen.keepScreenOn(true);

@@ -21,11 +21,12 @@ EXPORT = os.path.join(ROOT, "assets-src", "export")
 LAUNCHER_SIZE = 104
 LAUNCHER_SMALL_SIZE = 92
 
-# Lite <image> renders bitmaps at their native size, so every on-screen size is exported.
+# Lite <image> renders bitmaps at their native size, so every on-screen size is exported --
+# and nothing else: each bitmap ships as PNG + converted .bin, and the HAP travels over Bluetooth.
 IN_APP_SIZES = {
-    "squat_icon": [28, 64, 96],
-    "pushup_icon": [28, 64, 96],
-    "reppulse_app_icon": [48, 104],
+    "squat_icon": [28, 64],
+    "pushup_icon": [28, 64],
+    "reppulse_app_icon": [48],
 }
 
 QA_SIZES = [1024, 512, 192, 96, 48]

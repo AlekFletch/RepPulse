@@ -12,7 +12,7 @@ describe('icons', () => {
   test('launcher and in-app icons exist with the right format and size', () => {
     const result = checkIcons();
     expect(result.errors).toEqual([]);
-    expect(result.checkedIcons.length).toBeGreaterThanOrEqual(8);
+    expect(result.checkedIcons.length).toBeGreaterThanOrEqual(5);
   });
 
   test('icon constants; History Icon falls back to the placeholder and is logged', () => {
@@ -22,7 +22,8 @@ describe('icons', () => {
     const logger = { missingAsset: jest.fn() };
     expect(iconPath(ICON_HISTORY, 64, logger)).toBeNull();
     expect(logger.missingAsset).toHaveBeenCalled();
-    expect(iconPath(ICON_SQUAT, 96, logger)).toBe('/common/icons/squat_icon_96.png');
+    expect(iconPath(ICON_SQUAT, 64, logger)).toBe('/common/icons/squat_icon_64.png');
+    expect(iconPath(ICON_SQUAT, 96, logger)).toBeNull();
   });
 
   test('launcher icon is the RepPulse brand icon, not an exercise icon', () => {

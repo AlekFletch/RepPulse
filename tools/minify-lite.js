@@ -15,6 +15,18 @@ const terser = require(path.join(SDK, 'default/openharmony/js/build-tools/ace-lo
 const ROOT = path.resolve(__dirname, '..');
 const OUT = path.join(ROOT, 'entry/build/default/intermediates/loader_out_lite/default/js/MainAbility');
 
+/** Source maps: useless on the watch, wrong after minification, and ~40% of the HAP. */
+function removeMaps(dir) {
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      removeMaps(full);
+    } else if (entry.name.endsWith('.js.map')) {
+      fs.unlinkSync(full);
+    }
+  }
+}
+
 function jsFiles(dir) {
   let files = [];
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -41,6 +53,7 @@ async function main() {
     fs.writeFileSync(file, result.code);
     console.log(path.relative(OUT, file).padEnd(40) + (source.length + ' -> ' + result.code.length).padStart(18));
   }
+  removeMaps(OUT);
 }
 
 main().catch(function (e) {
