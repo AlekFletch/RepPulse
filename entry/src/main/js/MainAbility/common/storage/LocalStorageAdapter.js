@@ -40,15 +40,26 @@ export function createSystemStorageAdapter() {
     };
   }
 
-  function kvFail(cb) {
+  /**
+   * storage.get/set occasionally fail on the watch for no visible reason (seen in the
+   * BreathTrainer app on the same device); one retry avoids "settings were lost".
+   */
+  function kvFail(cb, retry) {
+    let retried = false;
     return function (data, code) {
+      if (!retried && retry) {
+        retried = true;
+        retry();
+        return;
+      }
       cb(storageError(StorageErrorCode.IO, code + ' ' + data));
     };
   }
 
   return {
     getItem: function (key, cb) {
-      try {
+      let fail = null;
+      function attempt() {
         storage.get({
           key: key,
           default: MISSING,
@@ -57,8 +68,12 @@ export function createSystemStorageAdapter() {
             const missing = value === MISSING || value === undefined || value === null;
             cb(null, missing ? null : String(value));
           },
-          fail: kvFail(cb)
+          fail: fail
         });
+      }
+      fail = kvFail(cb, attempt);
+      try {
+        attempt();
       } catch (e) {
         cb(storageError(StorageErrorCode.UNKNOWN, String(e)));
       }
@@ -73,13 +88,18 @@ export function createSystemStorageAdapter() {
         cb(storageError(StorageErrorCode.VALUE_TOO_LONG, value.length + ' > ' + MAX_KV_VALUE_LENGTH));
         return;
       }
-      try {
+      let fail = null;
+      function attempt() {
         storage.set({
           key: key,
           value: value,
           success: function () { cb(null); },
-          fail: kvFail(cb)
+          fail: fail
         });
+      }
+      fail = kvFail(cb, attempt);
+      try {
+        attempt();
       } catch (e) {
         cb(storageError(StorageErrorCode.UNKNOWN, String(e)));
       }
