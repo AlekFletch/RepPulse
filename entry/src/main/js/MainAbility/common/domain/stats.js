@@ -87,6 +87,10 @@ export function finalizeSession(session, finishedAtMs) {
   if (totals.averageCadence !== undefined) {
     session.averageCadence = totals.averageCadence;
   }
+  // Stored for later analysis, never shown (spec 4.1).
+  if (totals.avgConfidence !== undefined) {
+    session.avgConfidence = totals.avgConfidence;
+  }
   session.status = 'COMPLETED';
   return session;
 }

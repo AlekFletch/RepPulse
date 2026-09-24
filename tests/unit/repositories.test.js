@@ -3,7 +3,7 @@ import file from '@system.file';
 import { createInMemoryStorageAdapter } from '../../entry/src/main/js/MainAbility/common/storage/InMemoryStorageAdapter.js';
 import { createSystemStorageAdapter, KV_TIMEOUT_MS } from '../../entry/src/main/js/MainAbility/common/storage/LocalStorageAdapter.js';
 import { createWorkoutRepository, MAX_HISTORY } from '../../entry/src/main/js/MainAbility/common/storage/WorkoutRepository.js';
-import { createSettingsRepository } from '../../entry/src/main/js/MainAbility/common/storage/SettingsRepository.js';
+import { createSettingsRepository, SETTINGS_TIMEOUT_MS } from '../../entry/src/main/js/MainAbility/common/storage/SettingsRepository.js';
 import { createCalibrationRepository } from '../../entry/src/main/js/MainAbility/common/storage/CalibrationRepository.js';
 import { createCalibrationProfile, createDefaultSettings } from '../../entry/src/main/js/MainAbility/common/domain/models.js';
 import { saveLastSession } from '../../entry/src/main/js/MainAbility/common/storage/LastSessionStore.js';
@@ -73,17 +73,64 @@ describe('WorkoutRepository', () => {
 });
 
 describe('SettingsRepository', () => {
-  test('defaults, save, set, reload; every key fits the 128-character limit', async () => {
+  test('defaults, save, set, reload from the settings file', async () => {
     const repo = createSettingsRepository(createSystemStorageAdapter());
     expect((await call(repo.load)).value).toEqual(createDefaultSettings());
     const changed = Object.assign(createDefaultSettings(), { wristSide: 'RIGHT', sensitivity: 'HIGH' });
     expect((await call(repo.save, changed)).err).toBeNull();
-    await call(repo.set, 'vibrationOnRep', false);
-    const loaded = (await call(repo.load)).value;
+    expect((await call(repo.set, 'vibrationOnRep', false)).err).toBeNull();
+    // A new page gets a new repository: the values come back from the file.
+    const loaded = (await call(createSettingsRepository(createSystemStorageAdapter()).load)).value;
     expect(loaded).toMatchObject({ wristSide: 'RIGHT', sensitivity: 'HIGH', vibrationOnRep: false });
+    expect(Object.keys(file.__files())).toContain('internal://app/settings.json');
   });
 
-  test('storage that never answers settles after the timeout; settings fall back to defaults', () => {
+  test('a change made before the file is read survives the late read', async () => {
+    const adapter = createInMemoryStorageAdapter();
+    await call(createSettingsRepository(adapter).save, Object.assign(createDefaultSettings(), { wristSide: 'RIGHT' }));
+    const slow = Object.assign({}, adapter, {
+      readText: (path, cb) => setTimeout(() => adapter.readText(path, cb), 10)
+    });
+    const repo = createSettingsRepository(slow);
+    const loading = call(repo.load);
+    const setting = call(repo.set, 'sensitivity', 'HIGH');
+    expect((await loading).value).toMatchObject({ wristSide: 'RIGHT', sensitivity: 'HIGH' });
+    expect((await setting).err).toBeNull();
+    const reread = (await call(createSettingsRepository(adapter).load)).value;
+    expect(reread).toMatchObject({ wristSide: 'RIGHT', sensitivity: 'HIGH' });
+  });
+
+  test('writes go one at a time and the last one wins', async () => {
+    const adapter = createInMemoryStorageAdapter();
+    const order = [];
+    const slow = Object.assign({}, adapter, {
+      writeText: (path, text, cb) => {
+        order.push(JSON.parse(text).sensitivity);
+        setTimeout(() => adapter.writeText(path, text, cb), 5);
+      }
+    });
+    const repo = createSettingsRepository(slow);
+    await call(repo.load);
+    await Promise.all([call(repo.set, 'sensitivity', 'LOW'), call(repo.set, 'sensitivity', 'HIGH'),
+      call(repo.set, 'sensitivity', 'STANDARD')]);
+    expect(order).toEqual(['LOW', 'STANDARD']);
+    expect((await call(createSettingsRepository(adapter).load)).value.sensitivity).toBe('STANDARD');
+  });
+
+  test('a settings file that never answers settles with the defaults', () => {
+    jest.useFakeTimers();
+    try {
+      let loaded = null;
+      createSettingsRepository({ readText: () => {} }).load((err, settings) => { loaded = settings; });
+      expect(loaded).toBeNull();
+      jest.advanceTimersByTime(SETTINGS_TIMEOUT_MS);
+      expect(loaded).toEqual(createDefaultSettings());
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  test('storage.get/set that never answer settle after the timeout', () => {
     jest.useFakeTimers();
     try {
       const adapter = createSystemStorageAdapter();
@@ -95,12 +142,6 @@ describe('SettingsRepository', () => {
       expect(got).toEqual([]);
       jest.advanceTimersByTime(KV_TIMEOUT_MS);
       expect(got).toEqual([['get', null, null], ['set', 'IO']]);
-
-      let loaded = null;
-      storage.__silentNext(100);
-      createSettingsRepository(adapter).load((err, settings) => { loaded = settings; });
-      jest.advanceTimersByTime(KV_TIMEOUT_MS * 20);
-      expect(loaded).toEqual(createDefaultSettings());
     } finally {
       jest.useRealTimers();
     }
