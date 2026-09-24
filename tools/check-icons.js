@@ -9,10 +9,14 @@ const path = require('path');
 const ROOT = path.resolve(__dirname, '..');
 const MAIN = path.join(ROOT, 'entry', 'src', 'main');
 const JS_ROOT = path.join(MAIN, 'js', 'MainAbility');
-const LAUNCHER_ICON_REF = '$media:app_icon';
-const LAUNCHER_ICON_FILE = path.join(MAIN, 'resources', 'base', 'media', 'app_icon.png');
-// Official "[Lite]Empty Ability" template ships a 104x104 launcher icon.
-const LAUNCHER_SIZE = 104;
+// The lite wearable installer (GtBundleParser) accepts only "$media:icon" and requires both
+// media/icon.png and media/icon_small.png; anything else fails the install with error 40.
+const LAUNCHER_ICON_REF = '$media:icon';
+const MEDIA = path.join(MAIN, 'resources', 'base', 'media');
+const LAUNCHER_ICONS = [
+  { file: path.join(MEDIA, 'icon.png'), size: 104 },
+  { file: path.join(MEDIA, 'icon_small.png'), size: 92 }
+];
 const MAX_LAUNCHER_BYTES = 64 * 1024;
 
 function readPngSize(file) {
@@ -62,20 +66,28 @@ function checkIcons() {
     errors.push('config.json abilities must use icon ' + LAUNCHER_ICON_REF);
   }
 
-  if (!fs.existsSync(LAUNCHER_ICON_FILE)) {
-    errors.push('launcher icon missing: ' + path.relative(ROOT, LAUNCHER_ICON_FILE));
-  } else {
-    const size = readPngSize(LAUNCHER_ICON_FILE);
-    if (!size) {
-      errors.push('launcher icon is not a PNG');
-    } else {
-      if (size.width !== LAUNCHER_SIZE || size.height !== LAUNCHER_SIZE) {
-        errors.push(`launcher icon must be ${LAUNCHER_SIZE}x${LAUNCHER_SIZE}, got ${size.width}x${size.height}`);
-      }
-      if (size.bytes > MAX_LAUNCHER_BYTES) {
-        errors.push(`launcher icon too large: ${size.bytes} bytes`);
-      }
+  for (const icon of LAUNCHER_ICONS) {
+    const name = path.relative(ROOT, icon.file);
+    if (!fs.existsSync(icon.file)) {
+      errors.push('launcher icon missing: ' + name);
+      continue;
     }
+    const size = readPngSize(icon.file);
+    if (!size) {
+      errors.push(name + ' is not a PNG');
+      continue;
+    }
+    if (size.width !== icon.size || size.height !== icon.size) {
+      errors.push(`${name} must be ${icon.size}x${icon.size}, got ${size.width}x${size.height}`);
+    }
+    if (size.bytes > MAX_LAUNCHER_BYTES) {
+      errors.push(`${name} too large: ${size.bytes} bytes`);
+    }
+  }
+  const media = fs.existsSync(MEDIA) ? fs.readdirSync(MEDIA) : [];
+  const extra = media.filter((f) => f !== 'icon.png' && f !== 'icon_small.png');
+  if (extra.length) {
+    errors.push('unexpected files in resources/base/media: ' + extra.join(', '));
   }
 
   const icons = referencedIcons();

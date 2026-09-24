@@ -15,9 +15,11 @@ MEDIA = os.path.join(ROOT, "entry", "src", "main", "resources", "base", "media")
 IN_APP = os.path.join(ROOT, "entry", "src", "main", "js", "MainAbility", "common", "icons")
 EXPORT = os.path.join(ROOT, "assets-src", "export")
 
-# Launcher icon size follows the official DevEco "[Lite]Empty Ability" template (104x104).
-# TODO(device): confirm on Watch Fit 4; oversized launcher icons cause install error 40.
+# Lite wearable installer (GtBundleParser) hard-requires the ability icon to be exactly
+# "$media:icon" and both media/icon.png and media/icon_small.png to exist, otherwise the
+# install fails with error 40. Sizes match the BreathTrainer HAP proven on Watch Fit 4 Pro.
 LAUNCHER_SIZE = 104
+LAUNCHER_SMALL_SIZE = 92
 
 # Lite <image> renders bitmaps at their native size, so every on-screen size is exported.
 IN_APP_SIZES = {
@@ -33,7 +35,7 @@ def load(name):
     for ext in (".png", ".webp", ".svg"):
         path = os.path.join(SRC, name + ext)
         if os.path.exists(path):
-            return Image.open(path).convert("RGB")
+            return Image.open(path).convert("RGBA")
     raise FileNotFoundError("missing master asset: " + name)
 
 
@@ -45,7 +47,8 @@ def save(img, size, path):
 
 def main():
     app = load("reppulse_app_icon")
-    save(app, LAUNCHER_SIZE, os.path.join(MEDIA, "app_icon.png"))
+    save(app, LAUNCHER_SIZE, os.path.join(MEDIA, "icon.png"))
+    save(app, LAUNCHER_SMALL_SIZE, os.path.join(MEDIA, "icon_small.png"))
     for size in QA_SIZES:
         save(app, size, os.path.join(EXPORT, "reppulse_app_icon_%d.png" % size))
 

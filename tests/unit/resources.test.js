@@ -27,7 +27,7 @@ describe('icons', () => {
 
   test('launcher icon is the RepPulse brand icon, not an exercise icon', () => {
     const config = JSON.parse(fs.readFileSync(path.join(ROOT, 'entry/src/main/config.json'), 'utf8'));
-    expect(config.module.abilities[0].icon).toBe('$media:app_icon');
+    expect(config.module.abilities[0].icon).toBe('$media:icon');
     expect(config.module.deviceType).toEqual(['liteWearable']);
   });
 });

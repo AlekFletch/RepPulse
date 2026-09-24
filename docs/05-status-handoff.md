@@ -1,6 +1,6 @@
 # RepPulse — статус и передача контекста
 
-Обновлено: 2026-09-23. Документ для продолжения работы в новом диалоге. Здесь собраны главные факты, решения и открытые вопросы. Подробности — в [01](01-platform-verification.md) … [04](04-deveco-device-setup.md).
+Обновлено: 2026-09-24. Документ для продолжения работы в новом диалоге. Здесь собраны главные факты, решения и открытые вопросы. Подробности — в [01](01-platform-verification.md) … [04](04-deveco-device-setup.md).
 
 ---
 
@@ -10,7 +10,7 @@
 |---|---|
 | 1. Проверка платформы | ✅ [docs/01](01-platform-verification.md) |
 | 2. Каркас, модели, адаптеры, MockSensorProvider, тесты | ✅ [docs/03](03-stage2-architecture.md); 98 тестов, ESLint для lite JS |
-| Первая установка на часы (smoke) | ⛔ **Идёт: ошибка 40 при установке** — см. §4 |
+| Первая установка на часы (smoke) | 🔧 Причина ошибки 40 найдена и исправлена, ждём проверки на часах — см. §4 |
 | 3. UI-навигация, экраны, хранилище, контроллер тренировки | ⏳ не начат |
 | 4. Детекция повторов, калибровка | ⏳ |
 | 5. История, статистика, настройки, тесты, QA | ⏳ |
@@ -63,39 +63,31 @@
 
 ---
 
-## 4. ⛔ Открытая проблема: установка падает с ошибкой 40
+## 4. Ошибка 40 при установке — причина найдена (2026-09-24)
 
-DevEco Assistant пишет: *Installation failed: 40. Invalid configuration file format.*
+DevEco Assistant писал: *Installation failed: 40. Invalid configuration file format.* Падали все три варианта с разными разрешениями (A/B/C), так что разрешения ни при чём.
 
-Эталон — проект **BreathTrainer** (`C:\Claude\breath_trainer\watch`). Его HAP **ставится на эти же часы**. Конфиг вшит в `.bin` внутри HAP, его можно извлечь Python-скриптом: найти JSON по `"app"`.
+**Причина — launcher-иконка.** Установщик lite wearable (`GtBundleParser` в OpenHarmony `appexecfwk_lite`, `services/bundlemgr_lite/src/gt_bundle_parser.cpp`) проверяет две вещи:
+- иконка ability — **строго `"$media:icon"`** (`strcmp` с `DEFAULT_ICON_SETTING`), любое другое имя отклоняется;
+- в папке иконки должны лежать **оба файла**: `icon` и `icon_small` (`ICON_NAME` / `SMALL_ICON_NAME`), иначе иконка считается невалидной.
 
-**Что уже приведено к BreathTrainer (коммит `3992682`) — ошибка 40 осталась:**
-- target / compatible API = 5.0.0(12);
-- ability переименован в `.MainAbility`, папка `entry/src/main/js/MainAbility`;
-- у разрешений `reason` — обычная строка, добавлен `usedScene`; `READ_HEALTH_DATA` убран.
+У нас была `$media:app_icon` без маленькой иконки. У BreathTrainer — `$media:icon` плюс `icon_small.png`, поэтому он ставился.
 
-**Оставшиеся отличия от BreathTrainer:**
-1. Разрешения `ohos.permission.ACCELEROMETER` и `ohos.permission.GYROSCOPE`. У BreathTrainer только `VIBRATE`. **Главный подозреваемый.**
-2. Иконка называется `$media:app_icon`, у BreathTrainer — `$media:icon`. У BreathTrainer в `media` лежат ещё и `icon_small.png`.
-3. Ресурсы и страницы: i18n `ru-RU` / `en-US`, PNG-иконки в `common/icons` (в пакете превращаются в `.bin` по 3–43 КБ), страница `diagnostics`.
-4. `vendor`: `reppulse` у нас, `AKdev` у BreathTrainer. Вряд ли влияет.
+**Исправление:**
+- `config.json`: `"icon": "$media:icon"`;
+- `resources/base/media/`: `icon.png` 104×104 и `icon_small.png` 92×92, RGBA (размеры как у BreathTrainer);
+- `tools/export_icons.py` генерирует обе иконки, `npm run check:icons` проверяет имя в манифесте, оба файла, их размеры и что в `media` нет лишних файлов.
 
-**Эксперимент, результат которого ждём.** Собраны 3 HAP в `C:\Claude\RepPulse-haps\`:
+> ⚠️ Никогда не переименовывайте launcher-иконку и не удаляйте `icon_small.png`: установка снова упадёт с ошибкой 40.
+
+**HAP для проверки** в `C:\Claude\RepPulse-haps\` (старые A/B/C перенесены в `old\`):
 
 | Файл | Разрешения |
 |---|---|
-| `reppulse-A_vibrate_only.hap` | VIBRATE |
-| `reppulse-B_vibrate_accel.hap` | VIBRATE + ACCELEROMETER |
-| `reppulse-C_vibrate_gyro.hap` | VIBRATE + GYROSCOPE |
+| `reppulse-fix-icon_all-perms.hap` | ACCELEROMETER + GYROSCOPE + VIBRATE, как в репозитории |
+| `reppulse-fix-icon_vibrate-only.hap` | только VIBRATE, запасной |
 
-**Как читать результат:**
-- **A ставится, B или C нет** — убрать «ломающие» разрешения из `config.json`. Затем в «Диагностике» проверить, работает ли датчик без объявленного разрешения. По SDK разрешения нужны, но на lite это может не проверяться.
-- **A не ставится** — сравнить дальше по пунктам 2–3. Например:
-  - собрать RepPulse с иконкой `icon`;
-  - собрать RepPulse с минимальными страницами;
-  - или взять BreathTrainer, поменять в нём bundle name и добавлять наши части по одной.
-
-`config.json` в репозитории — это вариант со всеми тремя разрешениями (ACCELEROMETER, GYROSCOPE, VIBRATE).
+Если первый не ставится, а второй ставится, дело в разрешениях датчиков. Тогда убрать их из `config.json` и в «Диагностике» проверить, работают ли датчики без них.
 
 ---
 

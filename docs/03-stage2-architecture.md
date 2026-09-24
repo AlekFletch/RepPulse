@@ -8,8 +8,8 @@ RepPulse/
   entry/
     build-profile.json5 (apiType faMode), hvigorfile.ts (legacyHapTasks)
     src/main/
-      config.json                         # liteWearable, reqPermissions, icon $media:app_icon
-      resources/base/media/app_icon.png   # launcher 104×104 из главной иконки
+      config.json                         # liteWearable, reqPermissions, icon $media:icon (строго, см. 05 §4)
+      resources/base/media/icon.png       # launcher 104×104 + icon_small.png 92×92
       resources/base/element/string.json  # label/description/permission reasons
       js/MainAbility/
         app.js
@@ -135,7 +135,7 @@ PREPARING → PAUSED (приложение скрыто во время отсч
   2. выполнить `python tools/export_icons.py`;
   3. заполнить `ICON_HISTORY` в `icons.js`.
 - `npm run check:icons` (запускается и в Jest) проверяет:
-  - что манифест ссылается на `$media:app_icon`;
+  - что манифест ссылается на `$media:icon`, есть `icon.png` и `icon_small.png`;
   - что launcher-иконка — PNG 104×104 размером до 64 КБ;
   - что все иконки, на которые ссылается код, существуют и имеют нужный размер.
 

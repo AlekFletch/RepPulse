@@ -157,7 +157,7 @@ SQL/RDB на lite wearable недоступны: в SysCaps их нет.
 ## 10. Экран и иконки
 
 - Watch Fit 4: 1.82" AMOLED, **408 × 480** (портрет, прямоугольный). **OFF**
-- `config.json`: `deviceType: ["liteWearable"]`, иконка ability `"icon": "$media:app_icon"` (формат `$media:` — OFF). `distroFilter.screenWindow` = `"408*480"` — REP.
+- `config.json`: `deviceType: ["liteWearable"]`, иконка ability строго `"icon": "$media:icon"` + обязательные `media/icon.png` и `media/icon_small.png` (иначе ошибка установки 40, см. [05 §4](05-status-handoff.md)). `distroFilter.screenWindow` = `"408*480"` — REP.
 - Размер launcher-иконки: в официальном шаблоне DevEco 6.1 — **104×104** (`icon.png`), по сообщениям сообщества — 114×114. Используем 104×104. Слишком большие файлы дают error 40.
 - AppGallery listing icon: отдельный экспорт из master-файла. Точные требования AGC для часов — **TODO** перед публикацией.
 - Получены ассеты: `assets-src/icons/squat_icon.webp`, `pushup_icon.webp`, `reppulse_app_icon.webp` (главный знак: кольцо + pulse-wave + стрелка).
