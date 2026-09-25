@@ -36,7 +36,9 @@ describe('CalibrationEngine (spec 2.6)', () => {
     const p = result.profile;
     expect(p).toMatchObject({ id: 'cal1', exerciseType: 'SQUAT', wristSide: 'LEFT', isValid: true, createdAt: 1234 });
     expect(p.descentSignature.amplitude).toBeGreaterThan(0.25);
-    expect(p.minAmplitudeThreshold).toBeCloseTo(p.descentSignature.amplitude * 0.45, 2);
+    // Squats: calibration never raises the threshold above the baseline (deep calibration squats
+    // must not stop squats to parallel from counting).
+    expect(p.minAmplitudeThreshold).toBe(getBaseline('SQUAT').minAmplitudeThreshold);
     expect(p.minRepDurationMs).toBeLessThan(p.descentSignature.durationMs);
     expect(p.maxRepDurationMs).toBeGreaterThan(p.descentSignature.durationMs);
     // The profile counts the user's squats and still ignores walking.
@@ -45,12 +47,20 @@ describe('CalibrationEngine (spec 2.6)', () => {
   });
 
   test('shallow squats: calibration lowers the threshold so they count', () => {
-    const shallow = (seed) => S.squatSeries(5, { seed: seed }, { depthM: 0.14 });
+    const shallow = (seed) => S.squatSeries(5, { seed: seed }, { depthM: 0.05 });
     expect(count('SQUAT', shallow(2))).toBeLessThan(5);
     const { result } = calibrate('SQUAT', shallow(1));
     expect(result.ok).toBe(true);
     expect(result.profile.minAmplitudeThreshold).toBeLessThan(getBaseline('SQUAT').minAmplitudeThreshold);
     expect(count('SQUAT', shallow(2), result.profile)).toBe(5);
+  });
+
+  test('calibrating with deep squats does not stop squats to parallel from counting', () => {
+    const { result } = calibrate('SQUAT', S.squatSeries(5, { seed: 1 }, { depthM: 0.5 }));
+    expect(result.ok).toBe(true);
+    expect(result.profile.minAmplitudeThreshold).toBeLessThanOrEqual(getBaseline('SQUAT').minAmplitudeThreshold);
+    expect(count('SQUAT', S.squatSeries(10, { seed: 2 }, { depthM: 0.25, forwardM: 0.12 }), result.profile)).toBe(10);
+    expect(count('SQUAT', S.squatSeries(8, { seed: 3 }, { depthM: 0.15, forwardM: 0.07 }), result.profile)).toBe(8);
   });
 
   test('push-ups: profile with a gyroscope threshold', () => {

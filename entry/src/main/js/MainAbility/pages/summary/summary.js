@@ -10,7 +10,7 @@ let session = null;
 let saved = false;
 let saving = false;
 
-/** params: planJson + optionsJson (for "Повторить"), finishRestSec (finished from the rest page), saveFailed ('true' when the finished session was not stored). */
+/** Every finished workout goes to the history as soon as this page opens. params: planJson + optionsJson (for "Повторить"), finishRestSec (finished from the rest page), saveFailed ('true' when the finished session was not stored). */
 export default {
     data: {
         planJson: '',
@@ -50,6 +50,9 @@ export default {
                 ? last.finishedAt : new Date().getTime());
             session = last;
             self.show(last);
+            // Saved at once: the "Сохранить" button sits below the stats and was easy to miss,
+            // leaving the history empty (watch test 2026-09-25). The button retries a failed save.
+            self.save();
         });
     },
 

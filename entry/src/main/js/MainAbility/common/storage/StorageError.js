@@ -7,7 +7,9 @@ export const StorageErrorCode = Object.freeze({
 });
 
 /** @system.file fail codes (OpenHarmony docs): 202 bad argument, 300 I/O, 301 not found. */
-export function fromFileFailure(code, message) {
+export function fromFileFailure(platformCode, message) {
+  // The watch may report the code as a string.
+  const code = Number(platformCode);
   let mapped = StorageErrorCode.UNKNOWN;
   if (code === 301) {
     mapped = StorageErrorCode.NOT_FOUND;
@@ -16,7 +18,7 @@ export function fromFileFailure(code, message) {
   } else if (code === 202) {
     mapped = StorageErrorCode.INVALID_PATH;
   }
-  return { code: mapped, platformCode: code, message: message || '' };
+  return { code: mapped, platformCode: platformCode, message: message || '' };
 }
 
 export function storageError(code, message) {

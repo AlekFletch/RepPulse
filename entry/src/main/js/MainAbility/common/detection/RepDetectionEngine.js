@@ -223,7 +223,7 @@ export function createRepDetectionEngine(options) {
         if (amplitude < params.minAmp) {
           // Turned back before reaching the amplitude: a partial rep. Close the cycle now, so it
           // cannot linger and swallow the start of the next real rep.
-          rejectCycle('too shallow', x);
+          rejectCycle('too shallow ' + amplitude.toFixed(2), x);
           return null;
         }
         if (tPeak - tStart < params.minPhaseMs) {

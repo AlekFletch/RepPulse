@@ -2,7 +2,8 @@ import { ExerciseType } from '../domain/enums.js';
 import { angleDeg } from './FeatureExtractor.js';
 
 /**
- * Squat: the wrist travels down and up with the hips (~0.3–0.5 m), the forearm barely turns.
+ * Squat, arms held forward at chest height: the wrist travels down and up with the shoulders
+ * (a few cm for a shallow dip, ~0.2–0.4 m to parallel), the forearm barely turns.
  *   signal     estimated depth of the wrist, metres (FeatureExtractor.depth)
  *   rejection  a cycle whose wrist orientation turned more than SQUAT_MAX_TILT_DEG, or whose
  *              sideways acceleration rivals the vertical one, is an arm or torso movement (wave,
@@ -16,7 +17,12 @@ export const SQUAT_MAX_TILT_DEG = 45;
  * estimate also shows a wrist turn as sideways acceleration).
  */
 export const SQUAT_MAX_SIDEWAYS_RATIO = 1.3;
-const SIDEWAYS_FLOOR = 1.0;
+/**
+ * With the arms held forward the hips go back and the torso leans, so the wrists also travel
+ * forward and back (about half the vertical travel): sideways jitter below this never rejects a
+ * squat, m/s².
+ */
+const SIDEWAYS_FLOOR = 1.5;
 
 export function createSquatStrategy() {
   let sx = 0;

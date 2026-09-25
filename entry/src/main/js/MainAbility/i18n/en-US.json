@@ -37,6 +37,7 @@
     "calibrationHint": "Calibration helps improve counting accuracy",
     "estimateWarning": "Automatic counting is an estimate. Adjust the result manually if needed",
     "wearTightHint": "Wear the watch snugly on your wrist. Calibrate for more accurate counting",
+    "squatHandsHint": "Hold your arms horizontally in front of your chest, as if sitting at a desk. Squat at a normal pace",
     "pushUpAccuracyHint": "For best accuracy do classic floor push-ups and wear the watch snugly",
     "setOf": "Set {current} of {total}",
     "nextSetOf": "Next set: {current} of {total}",

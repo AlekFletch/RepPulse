@@ -17,6 +17,7 @@ export default {
         icon: '',
         title: '',
         pushUps: false,
+        squats: false,
         lowBattery: false,
         needsCalibration: false
     },
@@ -28,6 +29,7 @@ export default {
         this.icon = exerciseIcon(this.exercise, 64);
         this.title = this.$t('strings.' + exerciseKey(this.exercise));
         this.pushUps = this.exercise === ExerciseType.PUSH_UP;
+        this.squats = !this.pushUps;
         settings = createDefaultSettings();
         profile = null;
         const self = this;

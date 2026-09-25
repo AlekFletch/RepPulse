@@ -36,6 +36,7 @@ const countdown = createCountdownController(time);
 let wrist = WristSide.LEFT;
 let sensors = null;
 let engine = null;
+let recording = false;
 let limitTimer = null;
 
 /** params: exercise. The chosen wrist is stored as AppSettings.wristSide. */
@@ -51,6 +52,7 @@ export default {
         leftText: NORMAL_TEXT,
         rightColor: NORMAL,
         rightText: NORMAL_TEXT,
+        squat: false,
         countdownText: '',
         repsText: '0',
         progressText: '',
@@ -66,6 +68,9 @@ export default {
             this.exercise = ExerciseType.SQUAT;
         }
         this.icon = exerciseIcon(this.exercise, 28);
+        this.squat = this.exercise === ExerciseType.SQUAT;
+        engine = null;
+        recording = false;
         wrist = WristSide.LEFT;
         this.showWrist(wrist);
         const self = this;
@@ -126,6 +131,14 @@ export default {
         focusRotation(this.$refs.list, false);
         screen.keepScreenOn(true);
         this.show('vCountdown');
+        // Sensors run from the countdown on, so the filters are warm for the first rep.
+        engine = createCalibrationEngine(this.exercise, wrist);
+        sensors = createMotionSensorSource(time);
+        sensors.start(function (sample) {
+            self.onSample(sample);
+        }, function (error) {
+            logger.warn('sensor error ' + error.code);
+        });
         countdown.start(Timing.COUNTDOWN_SEC, function (n) {
             self.countdownText = String(n);
         }, function () {
@@ -133,25 +146,30 @@ export default {
         });
     },
 
+    onSample(sample) {
+        if (engine === null) {
+            return;
+        }
+        if (!recording) {
+            engine.warm(sample);
+            return;
+        }
+        const n = engine.process(sample);
+        if (n !== null) {
+            haptics.vibrate(HapticMode.SHORT);
+            this.paintProgress(n);
+            if (n >= MAX_CALIBRATION_REPS) {
+                this.finish();
+            }
+        }
+    },
+
     record() {
         const self = this;
-        engine = createCalibrationEngine(this.exercise, wrist);
+        recording = true;
         this.paintProgress(0);
         this.show('vRecording');
         haptics.vibrate(HapticMode.LONG);
-        sensors = createMotionSensorSource(time);
-        sensors.start(function (sample) {
-            const n = engine.process(sample);
-            if (n !== null) {
-                haptics.vibrate(HapticMode.SHORT);
-                self.paintProgress(n);
-                if (n >= MAX_CALIBRATION_REPS) {
-                    self.finish();
-                }
-            }
-        }, function (error) {
-            logger.warn('sensor error ' + error.code);
-        });
         limitTimer = time.setTimeout(function () {
             limitTimer = null;
             self.finish();
@@ -173,6 +191,7 @@ export default {
     },
 
     stopRecording() {
+        recording = false;
         countdown.cancel();
         if (limitTimer !== null) {
             time.clearTimeout(limitTimer);

@@ -143,6 +143,8 @@ function buildSquat(spec, rnd) {
   const partial = spec.partial === true;
   const depth = partial ? depthM * (spec.partialFactor || 0.3) : depthM;
   const pitchSwing = (typeof spec.pitchSwingDeg === 'number' ? spec.pitchSwingDeg : 8) * DEG;
+  // Hips go back and the torso leans: arms held forward also travel forward and back.
+  const forward = (typeof spec.forwardM === 'number' ? spec.forwardM : 0.05) * (partial ? depth / depthM : 1);
   const pauseMs = spec.pauseBetweenMs || 0;
   const windows = layoutReps(reps, spec.repDurationMs || 2200, pauseMs, spec.variation || 0.08, rnd);
   const poseDef = spec.pose || Pose.ARMS_FORWARD;
@@ -151,7 +153,7 @@ function buildSquat(spec, rnd) {
     poseAt: function (t) {
       const d = repDepthAt(windows, t);
       // Wrist travels down with the hips; the forearm tilts slightly for balance.
-      return makePose(0, 0.05 * d, -depth * d, poseDef.pitch, poseDef.roll)
+      return makePose(0, forward * d, -depth * d, poseDef.pitch, poseDef.roll)
         .pitchAdd(pitchSwing * d);
     },
     reps: mapReps(windows, ExerciseType.SQUAT, !partial)

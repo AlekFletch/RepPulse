@@ -45,8 +45,9 @@ export function slowPushUps(reps, options) {
   return pushUpSeries(reps, options, { repDurationMs: 3500 });
 }
 
+/** A knee bend of ~3 cm: since 2026-09-25 any clear dip of the arms-forward posture is a squat. */
 export function incompleteSquat(options) {
-  return squatSeries(1, options, { partial: true });
+  return squatSeries(1, options, { partial: true, partialFactor: 0.06 });
 }
 
 export function incompletePushUp(options) {

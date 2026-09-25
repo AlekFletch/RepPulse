@@ -94,6 +94,17 @@
     height: 130px;
     justify-content: center;
 }
+.text-item-tall {
+    width: 360px;
+    height: 170px;
+    justify-content: center;
+}
+.text-tall {
+    width: 360px;
+    height: 164px;
+    font-size: 22px;
+    color: #FFFFFF;
+}
 .text {
     width: 360px;
     height: 124px;

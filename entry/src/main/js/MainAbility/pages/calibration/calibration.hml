@@ -20,6 +20,9 @@
                     <text class="choice-text" style="color: {{rightText}};">{{ $t('strings.wristRight') }}</text>
                 </div>
             </list-item>
+            <list-item class="text-item-tall" if="{{squat}}">
+                <text class="text-tall">{{ $t('strings.squatHandsHint') }}</text>
+            </list-item>
             <list-item class="text-item">
                 <text class="text">{{ $t('strings.calibrationInstruction') }}</text>
             </list-item>

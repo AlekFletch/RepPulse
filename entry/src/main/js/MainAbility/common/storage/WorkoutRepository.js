@@ -37,14 +37,47 @@ export function summarize(session) {
  * All callbacks are cb(err, result).
  */
 export function createWorkoutRepository(storage) {
+  /**
+   * The index, or — when it is missing, unreadable or corrupt — one rebuilt from the record files.
+   * On the watch the "file not found" code of @system.file is not confirmed, and a failed index read
+   * must never stop a workout from being saved (history stayed empty on the watch, 2026-09-25).
+   */
   function readIndex(cb) {
     storage.readText(INDEX, function (err, text) {
+      const list = err ? null : safeParse(text, null);
+      if (Array.isArray(list)) {
+        cb(null, list);
+      } else {
+        rebuildIndex(cb);
+      }
+    });
+  }
+
+  function rebuildIndex(cb) {
+    storage.listFiles(DIR, function (err, names) {
       if (err) {
-        cb(err.code === StorageErrorCode.NOT_FOUND ? null : err, []);
+        cb(null, []);
         return;
       }
-      const list = safeParse(text, []);
-      cb(null, Array.isArray(list) ? list : []);
+      const list = [];
+      const steps = [];
+      for (let i = 0; i < names.length; i++) {
+        if (names[i].indexOf('w_') === 0) {
+          steps.push(readInto.bind(null, DIR + '/' + names[i]));
+        }
+      }
+      function readInto(path, next) {
+        readRecord(path, function (readErr, session) {
+          if (!readErr && session && session.plan && session.sets) {
+            list.push(summarize(session));
+          }
+          next(null);
+        });
+      }
+      series(steps, function () {
+        list.sort(function (a, b) { return b.startedAt - a.startedAt; });
+        cb(null, list.slice(0, MAX_HISTORY));
+      });
     });
   }
 
@@ -74,7 +107,8 @@ export function createWorkoutRepository(storage) {
       let dropped = [];
       series([
         function (next) {
-          storage.ensureDir(DIR, next);
+          // A failed access/mkdir is not fatal (the directory usually exists): the write decides.
+          storage.ensureDir(DIR, function () { next(null); });
         },
         function (next) {
           storage.writeText(recordPath(session.id), toAsciiJson(session), next);

@@ -14,6 +14,11 @@ const RELAXED_AMPLITUDE = 0.5;
  * Not higher: the first rep after rest reads ~half as deep (the filters start from zero).
  */
 const AMPLITUDE_SHARE = 0.45;
+/**
+ * Squats: calibration only ever lowers the threshold. Calibrating with deep squats used to raise it
+ * so far that squats to parallel stopped counting (watch test 2026-09-25).
+ */
+const SQUAT_AMPLITUDE_SHARE = 0.3;
 
 export const CalibrationFailure = Object.freeze({
   NOT_ENOUGH_REPS: 'NOT_ENOUGH_REPS',
@@ -45,6 +50,11 @@ export function createCalibrationEngine(exerciseType, wristSide) {
   });
 
   return {
+    /** During the countdown: warms the filters up, nothing is recorded. */
+    warm: function (sample) {
+      engine.process(sample);
+    },
+
     process: function (sample) {
       if (cycles.length >= MAX_CALIBRATION_REPS) {
         return null;
@@ -88,7 +98,7 @@ export function createCalibrationEngine(exerciseType, wristSide) {
       }
       const overrides = {
         isValid: true,
-        minAmplitudeThreshold: round3(Math.max(baseline.minAmplitudeThreshold * 0.4, amp * AMPLITUDE_SHARE)),
+        minAmplitudeThreshold: round3(amplitudeThreshold(exerciseType, baseline, amp)),
         minRepDurationMs: Math.max(300, Math.round(dur * 0.5)),
         maxRepDurationMs: Math.min(8000, Math.round(dur * 2.5)),
         descentSignature: { amplitude: round3(amp), durationMs: Math.round(dur) }
@@ -104,6 +114,14 @@ export function createCalibrationEngine(exerciseType, wristSide) {
       };
     }
   };
+}
+
+function amplitudeThreshold(exerciseType, baseline, amp) {
+  const base = baseline.minAmplitudeThreshold;
+  if (exerciseType === ExerciseType.SQUAT) {
+    return Math.min(base, Math.max(base * 0.4, amp * SQUAT_AMPLITUDE_SHARE));
+  }
+  return Math.max(base * 0.4, amp * AMPLITUDE_SHARE);
 }
 
 function round3(v) {

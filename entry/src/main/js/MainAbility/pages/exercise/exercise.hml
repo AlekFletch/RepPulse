@@ -11,6 +11,9 @@
         <list-item class="hint-item">
             <text class="hint">{{ $t('strings.wearTightHint') }}</text>
         </list-item>
+        <list-item class="hint-item-long" if="{{squats}}">
+            <text class="hint-long">{{ $t('strings.squatHandsHint') }}</text>
+        </list-item>
         <list-item class="hint-item-long" if="{{pushUps}}">
             <text class="hint-long">{{ $t('strings.pushUpAccuracyHint') }}</text>
         </list-item>

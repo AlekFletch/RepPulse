@@ -68,12 +68,14 @@ function setup(planInput, options) {
 }
 
 describe('WorkoutSessionController', () => {
-  test('free mode: 3-2-1, start vibration, sensors only while active', () => {
+  test('free mode: 3-2-1, start vibration; sensors warm up during the countdown without counting', () => {
     const t = setup({ mode: WorkoutMode.FREE });
     t.ctrl.start();
     expect(t.ctrl.getStatus()).toBe(S.PREPARING);
     expect(t.last().countdown).toBe(3);
-    expect(t.sensors.isRunning()).toBe(false);
+    expect(t.sensors.isRunning()).toBe(true);
+    t.rep();
+    expect(t.last().reps).toBe(0);
     t.time.advance(2000);
     expect(t.last().countdown).toBe(1);
     t.time.advance(1000);

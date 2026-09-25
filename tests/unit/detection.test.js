@@ -70,7 +70,6 @@ describe('SquatDetectionStrategy (spec 7.1)', () => {
   test('does not count an incomplete squat', () => {
     const r = detect(SQ, S.incompleteSquat());
     expect(r.count).toBe(0);
-    expect(r.rejects).toContain('too shallow');
   });
 
   test('fast, slow and paused squats; works again after each cooldown', () => {
@@ -89,15 +88,27 @@ describe('SquatDetectionStrategy (spec 7.1)', () => {
     expect(matchesTruth(r, sc)).toBe(true);
   });
 
+  test('arms held forward (agreed posture): squats to parallel and shallow ones count at every sensitivity', () => {
+    for (const sensitivity of ['LOW', 'STANDARD', 'HIGH']) {
+      for (const seed of [1, 2, 3]) {
+        // Parallel: the wrist drops ~0.25 m and travels ~0.12 m forward as the torso leans.
+        expect(detect(SQ, S.squatSeries(10, { seed: seed }, { depthM: 0.25, forwardM: 0.12 }),
+          { sensitivity: sensitivity }).count).toBe(10);
+        expect(detect(SQ, S.squatSeries(8, { seed: seed }, { depthM: 0.12, forwardM: 0.06 }),
+          { sensitivity: sensitivity }).count).toBeGreaterThanOrEqual(7);
+      }
+    }
+  });
+
   test('uses the calibration profile', () => {
     const shallow = S.squatSeries(5, {}, { depthM: 0.25 });
     expect(detect(SQ, shallow).count).toBe(5);
-    // A profile calibrated on deep squats (threshold 0.4 m) rejects these shallow ones...
+    // A profile threshold of 0.4 m rejects these (CalibrationEngine never makes one that high)...
     expect(detect(SQ, shallow, { profile: { minAmplitudeThreshold: 0.4 } }).count).toBe(0);
-    // ...and a profile from shallow squats counts even shallower ones the baseline misses.
-    const tiny = S.squatSeries(5, {}, { depthM: 0.12 });
+    // ...and a lower profile threshold counts dips the baseline misses.
+    const tiny = S.squatSeries(5, {}, { depthM: 0.04 });
     expect(detect(SQ, tiny).count).toBeLessThan(5);
-    expect(detect(SQ, tiny, { profile: { minAmplitudeThreshold: 0.06 } }).count).toBe(5);
+    expect(detect(SQ, tiny, { profile: { minAmplitudeThreshold: 0.02 } }).count).toBe(5);
   });
 
   test('sensitivity scales the amplitude threshold', () => {

@@ -90,6 +90,12 @@ export function createWorkoutSessionController(deps) {
     }
   }
 
+  function startSensors() {
+    if (sensors !== null && !sensors.isRunning()) {
+      sensors.start(onSample, onSensorError);
+    }
+  }
+
   function stopSensors() {
     if (sensors !== null) {
       sensors.stop();
@@ -115,10 +121,11 @@ export function createWorkoutSessionController(deps) {
     }
     activeSince = now();
     ignoreUntil = activeSince + Timing.RESUME_IGNORE_MS;
-    detector.reset();
     setStatus(S.ACTIVE);
-    if (sensors !== null && !sensors.isRunning()) {
-      sensors.start(onSample, onSensorError);
+    // Warmed up during the countdown: keep the filters, otherwise start from scratch.
+    if (sensors === null || !sensors.isRunning()) {
+      detector.reset();
+      startSensors();
     }
     if (ticker === null) {
       ticker = time.setInterval(tick, TICK_MS);
@@ -135,11 +142,11 @@ export function createWorkoutSessionController(deps) {
   }
 
   function onSample(sample) {
-    if (status !== S.ACTIVE) {
+    if (status !== S.ACTIVE && status !== S.PREPARING) {
       return;
     }
     const result = detector.process(sample);
-    if (result && result.detected && now() >= ignoreUntil) {
+    if (status === S.ACTIVE && result && result.detected && now() >= ignoreUntil) {
       countRep(result.confidence);
     }
   }
@@ -210,6 +217,10 @@ export function createWorkoutSessionController(deps) {
   function prepare() {
     countdownValue = Timing.COUNTDOWN_SEC;
     setStatus(S.PREPARING);
+    // The motion filters need a few seconds of the wrist at rest: without them the first squat of
+    // a set read half as deep and was missed (watch test 2026-09-25). Reps are not counted yet.
+    detector.reset();
+    startSensors();
     countdown.start(Timing.COUNTDOWN_SEC, function (n) {
       countdownValue = n;
       emit();

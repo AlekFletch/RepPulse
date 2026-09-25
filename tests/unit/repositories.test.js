@@ -72,6 +72,37 @@ describe('WorkoutRepository', () => {
   });
 });
 
+describe('WorkoutRepository without a readable index', () => {
+  test('an unreadable index (any error code) is rebuilt from the records; saving still works', async () => {
+    const adapter = createInMemoryStorageAdapter();
+    const repo = createWorkoutRepository(adapter);
+    await call(repo.save, session('a', 1000, 10));
+    await call(repo.save, session('b', 2000, 20));
+    // The watch may report a missing or broken index with an unexpected code.
+    const odd = Object.assign({}, adapter, {
+      readText: (path, cb) => (path === 'workouts/index.json'
+        ? cb({ code: 'UNKNOWN', platformCode: '1', message: 'no such file' })
+        : adapter.readText(path, cb))
+    });
+    const broken = createWorkoutRepository(odd);
+    expect((await call(broken.list)).value.map((e) => e.id)).toEqual(['b', 'a']);
+    expect((await call(broken.save, session('c', 3000, 5))).err).toBeNull();
+    expect((await call(repo.list)).value.map((e) => e.id)).toEqual(['c', 'b', 'a']);
+
+    await call(adapter.writeText, 'workouts/index.json', 'not json');
+    expect((await call(repo.list)).value.map((e) => e.id)).toEqual(['c', 'b', 'a']);
+  });
+
+  test('a failed mkdir does not stop the save', async () => {
+    const adapter = createInMemoryStorageAdapter();
+    const repo = createWorkoutRepository(Object.assign({}, adapter, {
+      ensureDir: (dir, cb) => cb({ code: 'IO', message: 'exists' })
+    }));
+    expect((await call(repo.save, session('a', 1000, 10))).err).toBeNull();
+    expect((await call(repo.list)).value).toHaveLength(1);
+  });
+});
+
 describe('SettingsRepository', () => {
   test('defaults, save, set, reload from the settings file', async () => {
     const repo = createSettingsRepository(createSystemStorageAdapter());

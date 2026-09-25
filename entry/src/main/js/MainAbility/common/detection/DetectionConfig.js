@@ -14,14 +14,20 @@ import { ExerciseType, Sensitivity } from '../domain/enums.js';
  */
 const BASELINES = {};
 
+/**
+ * Squats, arms held forward at chest height (the agreed posture). On the watch a squat to parallel
+ * was not counted with 0.15 m (2026-09-25): the wrist travels less than the hips, and the estimate
+ * is smaller still. Any clear dip counts now; walking is kept out by the rep duration (a step is
+ * ~0.5 s) and the shape checks, not by the depth.
+ */
 BASELINES[ExerciseType.SQUAT] = Object.freeze({
-  minRepDurationMs: 450,
-  maxRepDurationMs: 6000,
+  minRepDurationMs: 600,
+  maxRepDurationMs: 7000,
   minPhaseDurationMs: 200,
-  minAmplitudeThreshold: 0.15,
+  minAmplitudeThreshold: 0.06,
   minGyroThreshold: 0,
   cooldownMs: 250,
-  confidenceThreshold: 0.6
+  confidenceThreshold: 0.5
 });
 
 BASELINES[ExerciseType.PUSH_UP] = Object.freeze({
@@ -48,9 +54,9 @@ export const FILTERS = Object.freeze({
 
 /** Multiplier applied to amplitude thresholds; HIGH sensitivity = lower thresholds. */
 const SENSITIVITY_SCALE = {};
-SENSITIVITY_SCALE[Sensitivity.LOW] = 1.25;
+SENSITIVITY_SCALE[Sensitivity.LOW] = 1.3;
 SENSITIVITY_SCALE[Sensitivity.STANDARD] = 1.0;
-SENSITIVITY_SCALE[Sensitivity.HIGH] = 0.8;
+SENSITIVITY_SCALE[Sensitivity.HIGH] = 0.7;
 
 /** Extra confidence required when the gyroscope is unavailable (accelerometer-only mode). */
 export const ACCEL_ONLY_CONFIDENCE_BONUS = 0.1;
