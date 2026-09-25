@@ -12,6 +12,9 @@ const START_FRACTION = 0.3;
 const RETURN_FRACTION = 0.35;
 /** The bottom is confirmed once the signal falls back this share of the rep amplitude. */
 const BOTTOM_HYSTERESIS = 0.15;
+/** The ascent is over once the signal has not fallen by this share of the amplitude for SETTLE_MS. */
+const SETTLE_FRACTION = 0.1;
+const SETTLE_MS = 400;
 /** How fast the "top" level follows the signal upwards while READY. */
 const TOP_TAU_S = 1.5;
 
@@ -57,6 +60,8 @@ export function createRepDetectionEngine(options) {
   let tPeak = 0;
   let valley = 0;
   let tValley = 0;
+  let settledAt = 0;
+  let tSettled = 0;
   let cooldownUntil = 0;
   let lastSignal = 0;
   let lastReason = '';
@@ -233,6 +238,8 @@ export function createRepDetectionEngine(options) {
         phase = P.ASCENT;
         valley = x;
         tValley = t;
+        settledAt = x;
+        tSettled = t;
       }
       return null;
     }
@@ -243,6 +250,17 @@ export function createRepDetectionEngine(options) {
     if (x < valley) {
       valley = x;
       tValley = t;
+      if (x < settledAt - amplitude * SETTLE_FRACTION) {
+        settledAt = x;
+        tSettled = t;
+      }
+    }
+    // ...or once the wrist has stopped with most of the way back: drift can keep the signal from
+    // reaching the top, and waiting for the next rep counted this one seconds late on the watch.
+    if (t - tSettled >= SETTLE_MS && peak - valley >= Math.max(amplitude * 0.6, params.minAmp)) {
+      return confirm(t, x, null);
+    }
+    if (x <= valley) {
       return null;
     }
     // ...or, when slow drift keeps it from getting back there, at the lowest point before the
