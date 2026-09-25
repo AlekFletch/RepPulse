@@ -118,6 +118,43 @@ describe('SquatDetectionStrategy (spec 7.1)', () => {
     expect(falseCount).toBe(0);
   });
 
+  test('watch video 2026-09-25: bumps of the arm do not reset the depth or reject squats', () => {
+    // The arm bounced at the bottom (the other hand held a phone): each bump used to reset the
+    // gravity and |g| estimates, the depth then drifted to "READY -2.43 / 0.06" and most squats
+    // were lost ("too shallow 0.02", "descent too slow", "sideways 2.4 vs 1.6").
+    const bump = (sc, amp) => {
+      let next = 1500;
+      for (const s of sc.samples) {
+        if (s.t >= next && s.t < next + 80) {
+          s.ax += amp;
+          s.ay -= amp / 2;
+        } else if (s.t >= next + 80) {
+          next += 2300;
+        }
+      }
+      return sc;
+    };
+    let counted = 0;
+    let maxDepth = 0;
+    [1, 2, 3].forEach((seed) => {
+      const sc = bump(buildScenario([
+        { type: MotionType.IDLE, durationMs: 2500, pose: Pose.ARMS_FORWARD },
+        { type: MotionType.SQUAT, reps: 12, depthM: 0.22, forwardM: 0.12, pitchSwingDeg: 12, repDurationMs: 2200,
+          pauseBetweenMs: 800 },
+        { type: MotionType.IDLE, durationMs: 1500, pose: Pose.ARMS_FORWARD }
+      ], { seed: seed, accelBias: [0.15, -0.1, 0.08], accelScale: [1.015, 0.985, 1.02] }), 8);
+      const engine = createRepDetectionEngine({ exerciseType: SQ });
+      for (const s of sc.samples) {
+        if (engine.process(s)) {
+          counted++;
+        }
+        maxDepth = Math.max(maxDepth, Math.abs(parseFloat(engine.debugState().split(' ')[1])));
+      }
+    });
+    expect(counted).toBe(36);
+    expect(maxDepth).toBeLessThan(0.5);
+  });
+
   test('arms held forward (agreed posture): squats to parallel and shallow ones count at every sensitivity', () => {
     for (const sensitivity of ['LOW', 'STANDARD', 'HIGH']) {
       for (const seed of [1, 2, 3]) {

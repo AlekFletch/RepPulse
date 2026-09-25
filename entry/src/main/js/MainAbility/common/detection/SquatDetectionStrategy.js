@@ -5,25 +5,14 @@ import { angleDeg } from './FeatureExtractor.js';
  * Squat, arms held forward at chest height: the wrist travels down and up with the shoulders
  * (a few cm for a shallow dip, ~0.2–0.4 m to parallel), the forearm barely turns.
  *   signal     estimated depth of the wrist, metres (FeatureExtractor.depth)
- *   rejection  a cycle whose wrist orientation turned more than SQUAT_MAX_TILT_DEG, or whose
- *              sideways acceleration rivals the vertical one, is an arm or torso movement (wave,
- *              raise, reaching, turning), not a squat; walking moves the wrist only a few cm
- *              vertically and never reaches the amplitude threshold.
+ *   rejection  a cycle whose wrist orientation turned more than SQUAT_MAX_TILT_DEG is an arm
+ *              movement (wave, raise, reaching), not a squat; walking moves the wrist only a few
+ *              cm vertically and never reaches the amplitude threshold. Sideways acceleration is
+ *              not checked any more: a bump of the arm at the bottom rejected real squats on the
+ *              watch ("sideways 2.4 vs 1.6", 2026-09-25), and turns are handled by the
+ *              FeatureExtractor.
  */
 export const SQUAT_MAX_TILT_DEG = 45;
-/**
- * The hips go straight down and up, so the wrist accelerates mostly along gravity. A wave, a torso
- * turn or reaching accelerate it sideways as much (without a gyroscope the lagging gravity
- * estimate also shows a wrist turn as sideways acceleration).
- */
-export const SQUAT_MAX_SIDEWAYS_RATIO = 1.3;
-/**
- * With the arms held forward the hips go back and the torso leans, so the wrists also travel
- * forward and back (about half the vertical travel): sideways jitter below this never rejects a
- * squat, m/s².
- */
-const SIDEWAYS_FLOOR = 1.5;
-
 export function createSquatStrategy() {
   let sx = 0;
   let sy = 0;
@@ -62,9 +51,6 @@ export function createSquatStrategy() {
     reject: function () {
       if (maxTilt > SQUAT_MAX_TILT_DEG) {
         return 'wrist turned ' + Math.round(maxTilt) + ' deg';
-      }
-      if (horizPeak > SIDEWAYS_FLOOR && horizPeak > vertPeak * SQUAT_MAX_SIDEWAYS_RATIO) {
-        return 'sideways ' + horizPeak.toFixed(1) + ' vs ' + vertPeak.toFixed(1) + ' m/s2';
       }
       return '';
     },

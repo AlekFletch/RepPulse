@@ -173,7 +173,8 @@ export function createRepDetectionEngine(options) {
     const x = strategy.signal(f);
     lastSignal = x;
 
-    if (phase === P.IDLE) {
+    if (phase === P.IDLE || (f.turning && phase !== P.COOLDOWN)) {
+      // A turn of the arm is no part of a rep: start over once it is done.
       toReady(x);
       return null;
     }
