@@ -148,13 +148,16 @@ function buildSquat(spec, rnd) {
   const pauseMs = spec.pauseBetweenMs || 0;
   const windows = layoutReps(reps, spec.repDurationMs || 2200, pauseMs, spec.variation || 0.08, rnd);
   const poseDef = spec.pose || Pose.ARMS_FORWARD;
+  // The arms slowly sink and rise again over a set (tired arms): the watch orientation drifts.
+  const drift = (spec.postureDriftDeg || 0) * DEG;
+  const driftPeriodMs = spec.postureDriftPeriodMs || 12000;
   return {
     durationMs: windowsEnd(windows, pauseMs) + 200,
     poseAt: function (t) {
       const d = repDepthAt(windows, t);
       // Wrist travels down with the hips; the forearm tilts slightly for balance.
-      return makePose(0, forward * d, -depth * d, poseDef.pitch, poseDef.roll)
-        .pitchAdd(pitchSwing * d);
+      return makePose(0, forward * d, -depth * d, poseDef.pitch, poseDef.roll + drift * 0.5 * Math.sin(2 * Math.PI * t / (driftPeriodMs * 1.3)))
+        .pitchAdd(pitchSwing * d + drift * Math.sin(2 * Math.PI * t / driftPeriodMs));
     },
     reps: mapReps(windows, ExerciseType.SQUAT, !partial)
   };

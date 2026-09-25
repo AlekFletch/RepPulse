@@ -55,7 +55,9 @@ GRAVITY_TAU[ExerciseType.PUSH_UP] = 0.1;
 
 export const FILTERS = Object.freeze({
   gravityTauS: Object.freeze(GRAVITY_TAU),
-  integratorTauS: 3.0
+  // Leaky double integration: an |g| error b gives a depth offset of b·τ². 3 s turned the few
+  // 0.1 m/s² per-axis sensor errors (read differently as the arms sink over a set) into metres.
+  integratorTauS: 2.0
 });
 
 /** Multiplier applied to amplitude thresholds; HIGH sensitivity = lower thresholds. */

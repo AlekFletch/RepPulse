@@ -43,8 +43,9 @@ const STILL_TAU_S = 0.2;
  *               The gyroscope is deliberately not used here: its axis convention on the watch
  *               cannot be verified off the device, and a flipped axis would turn the estimate the
  *               wrong way; accelerometer-only tracking passes every synthetic scenario.
- *   vertAcc     acceleration along gravity, m/s², up positive: specific force along the gravity
- *               direction minus |g| (|g| averaged over GRAVITY_MAGNITUDE_TAU_S)
+ *   vertAcc     acceleration along gravity, m/s², up positive: magnitude of the specific force
+ *               minus |g| (|g| averaged over GRAVITY_MAGNITUDE_TAU_S); independent of the
+ *               direction estimate, so a slowly turning wrist adds no drift
  *   depth       vertical position, metres, down positive: vertAcc integrated twice with leaky
  *               integrators (a band-pass: fast enough to follow a squat, drift-free at rest)
  *   linAcc      magnitude of the acceleration without gravity, m/s²
@@ -136,7 +137,11 @@ export function createFeatureExtractor(options) {
       f.ux = gx / norm;
       f.uy = gy / norm;
       f.uz = gz / norm;
-      const along = ax * f.ux + ay * f.uy + az * f.uz;
+      // Vertical acceleration from the magnitude, not the projection on the gravity estimate:
+      // |g + a| = |g| + (a along g) + O(|a sideways|² / 2|g|). The projection needs the direction,
+      // which lags whenever the arms slowly sink or rise over a set; the error, g(1 - cos lag), was
+      // integrated into the ±2 m drift seen on the watch (video 2026-09-25, "READY -1.80").
+      const along = Math.sqrt(ax * ax + ay * ay + az * az);
       // Plain running mean at first (converges in a fraction of a second), then the slow average.
       // A small |g| error is integrated twice into a large depth drift.
       magSamples++;

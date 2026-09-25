@@ -7,6 +7,9 @@
         <text class="line">{{ accelLine }}</text>
     </list-item>
     <list-item class="row">
+        <text class="line">{{ normLine }}</text>
+    </list-item>
+    <list-item class="row">
         <text class="line">{{ gyroLine }}</text>
     </list-item>
     <list-item class="row">

@@ -22,14 +22,25 @@ let provider = null;
 let refreshTimer = null;
 let lastSample = null;
 let gyroSamples = 0;
+/** Accelerometer averaged over ~1 s, in g: resolves per-axis offset / scale errors of ~1 %. */
+let avgX = 0;
+let avgY = 0;
+let avgZ = 0;
+let avgCount = 0;
+const G = 9.80665;
 
 function fixed(v) {
     return (Math.round(v * 100) / 100).toString();
 }
 
+function fixed3(v) {
+    return (Math.round(v * 1000) / 1000).toString();
+}
+
 export default {
     data: {
         accelLine: '',
+        normLine: '',
         gyroLine: '',
         rateLine: '',
         resultLine: ''
@@ -46,8 +57,14 @@ export default {
         lastSample = null;
         gyroSamples = 0;
         provider = createHuaweiSensorProvider(time, logger);
+        avgCount = 0;
         provider.start(function (sample) {
             lastSample = sample;
+            const k = avgCount < 45 ? 1 / (avgCount + 1) : 1 / 45;
+            avgCount++;
+            avgX += (sample.ax / G - avgX) * k;
+            avgY += (sample.ay / G - avgY) * k;
+            avgZ += (sample.az / G - avgZ) * k;
             if (sample.hasGyro) {
                 gyroSamples++;
             }
@@ -88,7 +105,8 @@ export default {
         const caps = provider.getCapabilities();
         const noData = this.$t('strings.diagNoData');
         if (lastSample !== null) {
-            this.accelLine = 'A ' + fixed(lastSample.ax) + ' ' + fixed(lastSample.ay) + ' ' + fixed(lastSample.az);
+            this.accelLine = 'A ' + fixed3(avgX) + ' ' + fixed3(avgY) + ' ' + fixed3(avgZ);
+            this.normLine = '|A| ' + fixed3(Math.sqrt(avgX * avgX + avgY * avgY + avgZ * avgZ)) + ' g';
         } else {
             this.accelLine = this.$t('strings.diagAccel') + ': ' + noData;
         }

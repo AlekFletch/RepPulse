@@ -155,6 +155,26 @@ describe('SquatDetectionStrategy (spec 7.1)', () => {
     expect(maxDepth).toBeLessThan(0.5);
   });
 
+  test('watch video 2026-09-25 (2): arms slowly sinking and rising over a set add no drift', () => {
+    // The depth swung between -2 and +2.6 m on the watch while squatting steadily: the gravity
+    // direction lags a slow change of the arm posture, and the projection error was integrated.
+    const run = (repDurationMs, pauseBetweenMs) => {
+      let counted = 0;
+      [1, 2, 3].forEach((seed) => {
+        const sc = buildScenario([
+          { type: MotionType.IDLE, durationMs: 2500, pose: Pose.ARMS_FORWARD },
+          { type: MotionType.SQUAT, reps: 12, depthM: 0.22, forwardM: 0.12, pitchSwingDeg: 12, postureDriftDeg: 25,
+            repDurationMs: repDurationMs, pauseBetweenMs: pauseBetweenMs },
+          { type: MotionType.IDLE, durationMs: 1500, pose: Pose.ARMS_FORWARD }
+        ], { seed: seed });
+        counted += detect(SQ, sc).count;
+      });
+      return counted;
+    };
+    expect(run(2000, 500)).toBeGreaterThanOrEqual(35);
+    expect(run(3500, 2000)).toBeGreaterThanOrEqual(35);
+  });
+
   test('arms held forward (agreed posture): squats to parallel and shallow ones count at every sensitivity', () => {
     for (const sensitivity of ['LOW', 'STANDARD', 'HIGH']) {
       for (const seed of [1, 2, 3]) {
