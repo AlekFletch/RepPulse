@@ -8,6 +8,7 @@ import { ExerciseType, Sensitivity } from '../domain/enums.js';
  *   minGyroThreshold       peak angular speed a push-up must show, rad/s (0 = not checked)
  *   min/maxRepDurationMs   measured between the threshold crossings that open and close a rep,
  *                          so they are shorter than the full movement
+ *   maxDescentMs           a longer "descent" is drift, not a rep
  *   minPhaseDurationMs     shortest descent and ascent
  * Starting values tuned on the synthetic scenarios (tests/unit/detection.test.js); real
  * recordings from the watch should refine them.
@@ -22,7 +23,11 @@ const BASELINES = {};
  */
 BASELINES[ExerciseType.SQUAT] = Object.freeze({
   minRepDurationMs: 600,
-  maxRepDurationMs: 7000,
+  // Slow squats with a pause between them (7 reps/min on the watch, 2026-09-25): after each rep the
+  // depth estimate sinks below its start and creeps back during the pause, and that creep is timed
+  // as part of the next descent. A rep only has to be over within 10 s.
+  maxRepDurationMs: 10000,
+  maxDescentMs: 7000,
   minPhaseDurationMs: 200,
   minAmplitudeThreshold: 0.06,
   minGyroThreshold: 0,
@@ -33,6 +38,7 @@ BASELINES[ExerciseType.SQUAT] = Object.freeze({
 BASELINES[ExerciseType.PUSH_UP] = Object.freeze({
   minRepDurationMs: 450,
   maxRepDurationMs: 6000,
+  maxDescentMs: 4000,
   minPhaseDurationMs: 150,
   minAmplitudeThreshold: 15,
   minGyroThreshold: 0.3,

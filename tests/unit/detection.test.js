@@ -1,4 +1,5 @@
 import * as S from '../../entry/src/main/js/MainAbility/common/sensors/mock/scenarios.js';
+import { buildScenario, MotionType, Pose } from '../../entry/src/main/js/MainAbility/common/sensors/mock/motionSynth.js';
 import { createRepDetectionEngine, resolveParams } from '../../entry/src/main/js/MainAbility/common/detection/RepDetectionEngine.js';
 import { RepPhase } from '../../entry/src/main/js/MainAbility/common/detection/RepPhase.js';
 import { createSlidingWindowBuffer, median } from '../../entry/src/main/js/MainAbility/common/detection/SlidingWindowBuffer.js';
@@ -86,6 +87,35 @@ describe('SquatDetectionStrategy (spec 7.1)', () => {
     const r = detect(SQ, sc);
     expect(r.count).toBe(sc.truth.expectedReps);
     expect(matchesTruth(r, sc)).toBe(true);
+  });
+
+  test('watch test 2026-09-25: slow squats with pauses, real sensor errors, a brisk calibration', () => {
+    // Arms hang during the 3-2-1, then held forward; squats to parallel at ~7 per minute. Per-axis
+    // accelerometer offset and scale errors as in a real MEMS sensor. The calibrated duration window
+    // came from brisk reps (maxRep 3.5 s) and used to reject these as "too slow".
+    const errors = [
+      { accelBias: [0.15, -0.1, 0.08], accelScale: [1.015, 0.985, 1.02] },
+      { accelBias: [-0.12, 0.18, -0.05], accelScale: [0.98, 1.02, 0.99] },
+      { accelBias: [0.05, 0.05, -0.18], accelScale: [1.02, 1.01, 0.98] }
+    ];
+    const profile = { minAmplitudeThreshold: 0.06, minRepDurationMs: 700, maxRepDurationMs: 3500,
+      descentSignature: { amplitude: 0.2, durationMs: 1500 } };
+    let counted = 0;
+    let falseCount = 0;
+    errors.forEach((e, i) => {
+      const sc = buildScenario([
+        { type: MotionType.IDLE, durationMs: 3500, pose: Pose.ARM_HANGING },
+        { type: MotionType.IDLE, durationMs: 2500, pose: Pose.ARMS_FORWARD },
+        { type: MotionType.SQUAT, reps: 8, depthM: 0.25, forwardM: 0.12, repDurationMs: 3500, pauseBetweenMs: 2500 },
+        { type: MotionType.IDLE, durationMs: 1500, pose: Pose.ARMS_FORWARD }
+      ], Object.assign({ seed: i + 1 }, e));
+      const r = detect(SQ, sc, { profile: profile });
+      counted += r.count;
+      falseCount += r.count > 8 ? r.count - 8 : 0;
+    });
+    // The first squat right after raising the arms may still be missed (|g| is being re-averaged).
+    expect(counted).toBeGreaterThanOrEqual(21);
+    expect(falseCount).toBe(0);
   });
 
   test('arms held forward (agreed posture): squats to parallel and shallow ones count at every sensitivity', () => {

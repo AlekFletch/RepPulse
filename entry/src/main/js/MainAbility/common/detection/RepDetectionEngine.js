@@ -14,8 +14,6 @@ const RETURN_FRACTION = 0.35;
 const BOTTOM_HYSTERESIS = 0.15;
 /** How fast the "top" level follows the signal upwards while READY. */
 const TOP_TAU_S = 1.5;
-/** A "descent" longer than this is drift, not a rep: close the cycle early instead of at maxRep. */
-const MAX_DESCENT_MS = 4000;
 
 const P = RepPhase;
 
@@ -147,8 +145,9 @@ export function createRepDetectionEngine(options) {
     const ampScore = clamp01(0.5 + 0.5 * (amplitude - params.minAmp) / Math.max(1e-6, ref - params.minAmp));
     let durScore = 1;
     if (params.expectedDurationMs > 0) {
+      // Slower than the calibration is normal (tired, pauses); much faster looks like a jerk.
       const ratio = duration / params.expectedDurationMs;
-      durScore = clamp01(1 - Math.abs(Math.log(ratio)) / Math.log(4));
+      durScore = ratio < 1 ? clamp01(1 + Math.log(ratio) / Math.log(4)) : clamp01(1 - Math.log(ratio) / Math.log(8));
     }
     const balance = Math.min(descent, ascent) / Math.max(1, Math.max(descent, ascent));
     const phaseScore = clamp01(0.4 + balance);
@@ -204,10 +203,10 @@ export function createRepDetectionEngine(options) {
     // DESCENT / BOTTOM / ASCENT
     strategy.track(f, sample.hasGyro);
     if (t - tStart > params.maxRepMs) {
-      rejectCycle('too slow', x);
+      rejectCycle('too slow ' + (t - tStart) + ' ms', x);
       return null;
     }
-    if (phase === P.DESCENT && t - tStart > MAX_DESCENT_MS) {
+    if (phase === P.DESCENT && t - tStart > params.maxDescentMs) {
       rejectCycle('descent too slow', x);
       return null;
     }
@@ -294,8 +293,11 @@ export function resolveParams(exerciseType, profile, sensitivity) {
   const signature = p.descentSignature || {};
   return {
     minAmp: pick('minAmplitudeThreshold') * getSensitivityScale(sensitivity),
-    minRepMs: pick('minRepDurationMs'),
-    maxRepMs: pick('maxRepDurationMs'),
+    // Calibration can only widen the duration window: a profile from brisk reps must not reject
+    // slower ones ("too slow" after calibration on the watch, 2026-09-25).
+    minRepMs: Math.min(pick('minRepDurationMs'), base.minRepDurationMs),
+    maxRepMs: Math.max(pick('maxRepDurationMs'), base.maxRepDurationMs),
+    maxDescentMs: base.maxDescentMs,
     minPhaseMs: base.minPhaseDurationMs,
     cooldownMs: base.cooldownMs,
     minGyro: pick('minGyroThreshold'),

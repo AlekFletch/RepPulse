@@ -108,8 +108,15 @@ export function createFeatureExtractor(options) {
       f.horizAcc = h2 > 0 ? Math.sqrt(h2) : 0;
 
       if (f.horizAcc > TURN_SIDEWAYS) {
+        // The arm turned (e.g. raised from hanging to forward): the lagging gravity estimate would
+        // leave a large projection error for seconds. Jump to the current direction and start over.
+        gx = ax;
+        gy = ay;
+        gz = az;
         vel = 0;
         pos = 0;
+        // Per-axis scale errors make |g| read differently in the new orientation: average afresh.
+        magSamples = 0;
       }
       const decay = 1 - dt / integratorTau;
       vel = vel * decay + f.vertAcc * dt;

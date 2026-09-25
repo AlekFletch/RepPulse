@@ -350,6 +350,9 @@ export function buildScenario(segmentSpecs, options) {
   const hasGyro = opts.hasGyro !== false;
   const mirror = opts.wristSide === WristSide.RIGHT;
   const transitionMs = typeof opts.transitionMs === 'number' ? opts.transitionMs : 400;
+  // MEMS errors per axis: zero offset, m/s², and scale (1 = exact). Typical: ±0.2 m/s², ±2 %.
+  const bias = opts.accelBias || [0, 0, 0];
+  const scale = opts.accelScale || [1, 1, 1];
 
   const segments = [];
   const truthReps = [];
@@ -414,9 +417,9 @@ export function buildScenario(segmentSpecs, options) {
       // omega_dev = (pitch', roll' cos(pitch), -roll' sin(pitch)) for R = Ry(roll) Rx(pitch)
       const gyro = [pitchRate, rollRate * Math.cos(p1.pitch), -rollRate * Math.sin(p1.pitch)];
 
-      let ax = acc[0] + rnd.gaussian(0, accelNoise);
-      const ay = acc[1] + rnd.gaussian(0, accelNoise);
-      const az = acc[2] + rnd.gaussian(0, accelNoise);
+      let ax = acc[0] * scale[0] + bias[0] + rnd.gaussian(0, accelNoise);
+      const ay = acc[1] * scale[1] + bias[1] + rnd.gaussian(0, accelNoise);
+      const az = acc[2] * scale[2] + bias[2] + rnd.gaussian(0, accelNoise);
       const gx = gyro[0] + rnd.gaussian(0, gyroNoise);
       let gy = gyro[1] + rnd.gaussian(0, gyroNoise);
       let gz = gyro[2] + rnd.gaussian(0, gyroNoise);
